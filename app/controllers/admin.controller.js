@@ -25,6 +25,7 @@ const doRegister = (req, res) =>{
 				console.log(image);
 				_.assign(loginMetaPostData,{ 'documents': image });
 			});
+			return res.status(200).send({ status: 1, data: loginMetaPostData, message: "User was registered successfully!" });
 			console.log(loginMetaPostData);
 			LoginMeta.create(loginMetaPostData).then(() => {
 				res.status(200).send({ status: 1, data: [], message: "User was registered successfully!" });
