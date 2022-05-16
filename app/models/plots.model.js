@@ -16,7 +16,7 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.FLOAT(11)
         },
         documents : {
-            type: Sequelize.TEXT
+            type: Sequelize.STRING
         },
         selling_amount : {
             type: Sequelize.FLOAT(11)

@@ -8,15 +8,16 @@ const mime = require('mime');
 const plots = db.plots;
 
 // Create and Save a new Township
-const create = (req, res) => {
+const create = async (req, res) => {
     // Validate request
     if(!(_.isEmpty(req.body))){
 		var townshipPostData = req.body;
 		  // Save Township to Database
 		  console.log(townshipPostData); 
-		  	var ImageFileName = uploadImage(req.body).then((image)=>{
-				_.assign(townshipPostData,{ 'documents': image });
-			});
+		  	var ImageFileName = await uploadImage(req.body)
+			//   .then((image)=>{
+			// 	_.assign(townshipPostData,{ 'documents': image });
+			// });
 		  	Townships.create(townshipPostData).then(township => {
 				res.send({ status:1, data:[], message: "Township was registered successfully!" });
 			})

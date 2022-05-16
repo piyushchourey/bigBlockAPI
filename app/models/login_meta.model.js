@@ -12,13 +12,13 @@ module.exports = (sequelize, Sequelize) => {
         type: DataTypes.TEXT
       },
       mobile_number:{
-        type: DataTypes.INTEGER
+        type: DataTypes.STRING
       },
       aadhar_number:{
-        type: DataTypes.INTEGER
+        type: DataTypes.STRING
       },
       documents: {
-        type: DataTypes.BLOB
+        type: DataTypes.STRING
       }
     },{
   hooks: {

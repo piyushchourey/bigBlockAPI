@@ -25,7 +25,7 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING
         },
         documents : {
-            type: Sequelize.TEXT
+            type: Sequelize.STRING
         },
         latitude : {
             type: Sequelize.FLOAT(11)

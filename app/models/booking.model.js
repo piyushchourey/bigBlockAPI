@@ -13,16 +13,16 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING(25)
         },
         aadharcardNumber : {
-            type: Sequelize.INTEGER
+            type: Sequelize.STRING
         },
         aadharcardDoc: { 
-            type: Sequelize.TEXT
+            type: Sequelize.STRING
         },
         salarySlipDoc: {
-            type: Sequelize.TEXT
+            type: Sequelize.STRING
         },
         agreementDoc: {
-            type: Sequelize.TEXT
+            type: Sequelize.STRING
         },
         plotAmount: {
             type: Sequelize.FLOAT
