@@ -18,6 +18,7 @@ const create = async (req, res) => {
 			//   .then((image)=>{
 			// 	_.assign(townshipPostData,{ 'documents': image });
 			// });
+			townshipPostData['documents']= ImageFileName; 
 		  	Townships.create(townshipPostData).then(township => {
 				res.send({ status:1, data:[], message: "Township was registered successfully!" });
 			})
