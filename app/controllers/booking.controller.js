@@ -86,7 +86,8 @@ const uploadImage = async (req, res, next) => {
 	let imageBuffer = decodedImg.data;
 	let type = decodedImg.type;
 	let extension = mime.getExtension(type); 
-	let fileName = "image." + extension;
+	let randomName = new Date().getTime();
+	let fileName = randomName +"." + extension;
 	try {
 		fs.writeFileSync("./images/" + fileName, imageBuffer, 'utf8');
 		return fileName;
