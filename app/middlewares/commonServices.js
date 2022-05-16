@@ -1,7 +1,7 @@
 const db = require("../models");
 const Townships = db.townships;
 const Plots = db.plots;
-
+var _ = require('lodash');
 
 checkDuplicateTownship = (req, res, next) => {
   // Email
@@ -14,6 +14,8 @@ checkDuplicateTownship = (req, res, next) => {
   }).then(township => {
     if (township) {
       res.status(400).send({
+        status :0,
+        data:[],
         message: "Failed! Township name is already in use with mention state and city!"
       });
       return;
@@ -21,6 +23,46 @@ checkDuplicateTownship = (req, res, next) => {
       next();
     }
   });
+};
+
+plotVerify = (req, res, next) =>{
+  if(req.body.plotNumber){
+    Plots.findOne({
+      where: {
+        plot_number :req.body.plotNumber
+      }
+    }).then(plot => {
+      console.log("sadsad"+ plot)
+      if(_.size(plot)){
+        if(plot.status > 0){
+          res.status(400).send({
+            status :0,
+            data :[],
+            message: "Failed! This Plot has been Booked!"
+          });
+        }else{
+          next();
+        }
+        return;
+      }else if (_.isNull(plot)) {
+        res.status(400).send({
+          status :0,
+          data :[],
+          message: "Failed! This Plot is not registered in our DB."
+        });
+        return;
+      }else{
+        next();
+      }
+    });
+  }else{
+    res.status(400).send({
+      status :0,
+      data:[],
+      message: "Plot number is missing."
+    });
+    return;
+  }
 };
 
 checkDuplicatePlotWithTownship = (req, res, next) => {
@@ -33,6 +75,8 @@ checkDuplicatePlotWithTownship = (req, res, next) => {
   }).then(township => {
     if (township) {
       res.status(400).send({
+        status :0,
+        data :[],
         message: "Failed! This Plot is already in added with township!"
       });
       return;
@@ -44,6 +88,7 @@ checkDuplicatePlotWithTownship = (req, res, next) => {
 
 const commonServices = {
   checkDuplicateTownship: checkDuplicateTownship,
-  checkDuplicatePlotWithTownship : checkDuplicatePlotWithTownship
+  checkDuplicatePlotWithTownship : checkDuplicatePlotWithTownship,
+  plotVerify : plotVerify
 };
 module.exports = commonServices; 

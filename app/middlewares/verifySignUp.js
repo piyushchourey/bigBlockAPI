@@ -10,6 +10,8 @@ checkDuplicateEmail = (req, res, next) => {
     console.log("fyfhggg"+user);
     if (user) {
       res.status(400).send({
+        status :0,
+        data:[],
         message: "Failed! Email is already in use!"
       });
       return;
@@ -19,7 +21,29 @@ checkDuplicateEmail = (req, res, next) => {
   });
 };
 
+isExistUser = (req, res, next) => {
+  // Email
+  Login.findOne({
+    where: {
+      id: req.body.userId
+    }
+  }).then(user => {
+    console.log("fyfhggg"+user);
+    if (!user) {
+      res.status(400).send({
+        status :0,
+        data :[],
+        message: "Sorry! User is not exist in our DB."
+      });
+      return;
+    }else{
+      next();
+    }
+  });
+};
+
 const verifySignUp = {
-  checkDuplicateEmail: checkDuplicateEmail
+  checkDuplicateEmail: checkDuplicateEmail,
+  isExistUser :isExistUser
 };
 module.exports = verifySignUp; 

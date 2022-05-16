@@ -26,14 +26,14 @@ const doRegister = (req, res) =>{
 				_.assign(loginMetaPostData,{ 'documents': image });
 			});
 			LoginMeta.create(loginMetaPostData).then(() => {
-				res.send({ message: "User was registered successfully!" });
+				res.send({ status:1, data:[],  message: "User was registered successfully!" });
 			}); 
 		  })
 		  .catch(err => {
-			res.status(500).send({ message: err.message });
+			res.status(500).send({ status:0, data:[], message: err.message });
 		  });
 	}else{
-		res.send({"status":200,"msg":"Post data is not valid."});
+		res.send({ status:0, data:[], message: 'Post data is not valid.' });
 	}
 };
 
@@ -51,6 +51,7 @@ const dologin = (req, res) => {
       		//if password is not correct..
       		if (!passwordIsValid) {
 		        return res.status(401).send({
+				  status :0,
 		          accessToken: null,
 		          message: "Invalid Password!"
 		        });
@@ -68,12 +69,14 @@ const dologin = (req, res) => {
 	          accessToken: token
 	        });
       	}else{
-      		res.send({"status":200,"msg":"User does not exist."});
+      		res.send({ status:0, data:[], message: 'User does not exist.' });
       	}
         
       })
       .catch(err => {
         res.status(500).send({
+		  status :0,
+		  data : [],
           message:
             err.message || "Some error occurred while retrieving tutorials."
         });
@@ -83,4 +86,4 @@ const dologin = (req, res) => {
 module.exports = {
     dologin,
     doRegister
-};
+}; 

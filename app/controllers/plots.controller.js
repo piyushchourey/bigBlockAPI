@@ -18,13 +18,13 @@ const create = (req, res) => {
 				_.assign(PlotPostData,{ 'documents': image });
 			});
 			Plots.create(PlotPostData).then(plot => {
-				res.send({ message: "Plot was registered successfully!" });
+				res.send({ status :1, data:[], message: "Plot was registered successfully!" });
 			})
 			.catch(err => {
-			res.status(500).send({ message: err.message });
+			res.status(500).send({ status :0, data :[], message: err.message });
 			});
 	}else{
-		res.send({"status":200,"msg":"Post data is not valid."});
+		res.send({ status :0, data :[], message: "Post data is not valid." });
 	}
 };
 
@@ -32,6 +32,11 @@ const create = (req, res) => {
 const getAll = (req, res) => {
 	const orConditions = [];
 	const paramObj = { include: [Townships] };
+	if(req.query.id){
+		const id = req.query.id; 
+		var townshipCondition = id ? { id: { [Op.eq]: id } } : null;
+		orConditions.push(townshipCondition);
+	}
 	if(req.query.townshipId){
 		const townshipId = req.query.townshipId; 
 		var townshipCondition = townshipId ? { townshipId: { [Op.eq]: `${townshipId}` } } : null;
@@ -58,11 +63,13 @@ const getAll = (req, res) => {
 	}
 	console.log(paramObj);
 	Plots.findAll(paramObj).then(data => {
-		res.send(data);
+		res.send({ status :1, data:data, message: "" });
 	  })
 	  .catch(err => {
 		res.status(500).send({ 
-		  message:
+			statu :0,
+			data:[],
+		  	message:
 			err.message || "Some error occurred while retrieving tutorials."
 		});
 	  });

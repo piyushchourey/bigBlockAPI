@@ -5,6 +5,7 @@ var _ = require('lodash');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const mime = require('mime');
+const plots = db.plots;
 
 // Create and Save a new Township
 const create = (req, res) => {
@@ -17,13 +18,13 @@ const create = (req, res) => {
 				_.assign(townshipPostData,{ 'documents': image });
 			});
 		  	Townships.create(townshipPostData).then(township => {
-				res.send({ message: "Township was registered successfully!" });
+				res.send({ status:1, data:[], message: "Township was registered successfully!" });
 			})
 		  .catch(err => {
-			res.status(500).send({ message: err.message });
+			res.status(500).send({ status:0, data:[], message: err.message });
 		  });
     }else{
-    	res.send({"status":200,"msg":"Post data is not valid."});
+    	res.send({ status:0, data:[], message: 'Post data is not valid.' });
     }
 };
 
@@ -31,6 +32,11 @@ const create = (req, res) => {
 const getAll = (req, res) => {
 	const orConditions = [];
 	const paramObj = {};
+	if(req.query.id){
+		const id = req.query.id; 
+		var townshipCondition = id ? { id: { [Op.eq]: id } } : null;
+		orConditions.push(townshipCondition);
+	}
 	if(req.query.township_name){
 		const township_name = req.query.township_name; 
 		var townshipCondition = township_name ? { township_name: { [Op.like]: `%${township_name}%` } } : null;
@@ -55,11 +61,14 @@ const getAll = (req, res) => {
 	if(_.size(orConditions) > 0){
 		paramObj.where = { [Op.or]: orConditions };
 	}
+	paramObj.include = [plots]
 	Townships.findAll(paramObj).then(data => {
-		res.send(data);
+		res.send({ status:1, data:data, message: '' });
 	  })
 	  .catch(err => {
 		res.status(500).send({ 
+		  status :0,
+		  data :[],
 		  message:
 			err.message || "Some error occurred while retrieving tutorials."
 		});
@@ -91,7 +100,26 @@ const uploadImage = async (req, res, next) => {
 	}
 }
 
+const doRemove = ( req, res ) =>{ 
+	const id = req.query.id;
+	Townships.destroy({
+		where: { id: id }
+	   })
+	  .then(data => {
+		res.send({ status:1, data:[], message:"Township deleted successfully."});
+	  })
+	  .catch(err => {
+		res.status(500).send({
+		  status :0,
+		  data : [],
+		  message:
+			err.message || "Some error occurred while retrieving tutorials."
+		});
+	  });
+};
+
 module.exports = {
     create,
-    getAll
+    getAll,
+	doRemove
 };

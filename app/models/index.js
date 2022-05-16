@@ -25,6 +25,7 @@ db.login = require("./login.model.js")(sequelize, Sequelize);
 db.LoginMeta = require("./login_meta.model.js")(sequelize, Sequelize);
 db.townships = require("./townships.model.js")(sequelize, Sequelize);
 db.plots = require("./plots.model.js")(sequelize, Sequelize);
+db.booking = require("./booking.model.js")(sequelize, Sequelize);
 
 /*Login - user meta relationship */
 db.login.hasOne(db.LoginMeta);

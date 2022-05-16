@@ -27,14 +27,14 @@ const doRegister = (req, res) =>{
 			});
 			console.log(loginMetaPostData);
 			LoginMeta.create(loginMetaPostData).then(() => {
-				res.send({ message: "User was registered successfully!" });
+				res.status(200).send({ status: 1, data: [], message: "User was registered successfully!" });
 			}); 
 		  })
 		  .catch(err => {
-			res.status(500).send({ message: err.message });
+			res.status(500).send({ status: 0, data: [], message: err.message });
 		  });
 	}else{
-		res.send({"status":200,"msg":"Post data is not valid."});
+		res.send({ status: 0, data: [], message: "Post data is not valid." });
 	}
 };
 
@@ -69,17 +69,39 @@ const getAll = (req, res) => {
 	var condition = first_name ? { first_name: { [Op.like]: `%${first_name}%` } } : null;
 	LoginMeta.findAll({ where: condition, include: [Login] })
 	  .then(data => {
-		res.send(data);
+		res.send({ status:1,data:data, message:""});
 	  })
 	  .catch(err => {
 		res.status(500).send({
+		  status :0,
+		  data : [],
 		  message:
 			err.message || "Some error occurred while retrieving tutorials."
 		});
 	  });
 };
 
+const doRemove = ( req, res ) =>{ 
+	const id = req.query.id;
+	LoginMeta.destroy({
+		where: { id: id }
+	   })
+	  .then(data => {
+		res.send({ status:1, data:[], message:"Admin deleted successfully."});
+	  })
+	  .catch(err => {
+		res.status(500).send({
+		  status :0,
+		  data : [],
+		  message:
+			err.message || "Some error occurred while retrieving tutorials."
+		});
+	  });
+};
+
+
 module.exports = {
   doRegister,
-  getAll
+  getAll,
+  doRemove
 }
