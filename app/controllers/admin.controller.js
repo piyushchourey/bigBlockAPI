@@ -73,21 +73,25 @@ const uploadImage = async (req, res, next) => {
 }
 
 /*This function is used to get all data */
-const getAll = (req, res) => {
+const getAll =  async (req, res) => {
 	const first_name = req.query.first_name;
-	var condition = first_name ? { first_name: { [Op.like]: `%${first_name}%` } } : null;
-	LoginMeta.findAll({ where: condition, include: [Login] })
-	  .then(data => {
-		res.send({ status:1,data:data, message:""});
-	  })
-	  .catch(err => {
+	try{
+		var condition = first_name ? { first_name: { [Op.like]: `%${first_name}%` } } : null;
+		let userData = await LoginMeta.findAll({ where: condition, include: [Login] })
+		const promises1 =  userData.map(async (f) => {
+			f.documents =  process.env.API_URL+'images/'+f.documents;
+			return f;
+		 })
+		let newArray = await Promise.all(promises1);
+		res.send({ status:1,data:newArray, message:""});
+	}catch(err){
 		res.status(500).send({
-		  status :0,
-		  data : [],
-		  message:
-			err.message || "Some error occurred while retrieving tutorials."
-		});
-	  });
+			status :0,
+			data : [],
+			message:
+			  err.message || "Some error occurred while retrieving tutorials."
+		  });
+	}
 };
 
 const doRemove = ( req, res ) =>{ 
