@@ -21,32 +21,29 @@ const doRegister = async (req, res) =>{
 		  //console.log(loginPostData); 
 		  Login.create(loginPostData).then(user => {
 			_.assign(loginMetaPostData,{ 'loginId': user.id });
-			// var ImageFileName =  uploadImage(req.body)
-			// .then((image)=>{
-				//console.log(image);
-				//loginMetaPostData['documents'] = image;
-				//_.assign(loginMetaPostData,{ 'documents': image });
+			var ImageFileName =  uploadImage(req.body)
+			.then((image)=>{
+				console.log(image);
+				loginMetaPostData['documents'] = image;
 				//console.log(ImageFileName)
 			//console.log('test123',loginMetaPostData);
 			 //res.status(200).send({ status: 1, data: loginMetaPostData, message: "User was registered successfully!" });
 		// console.log(loginMetaPostData);
-			loginMetaPostData['documents'] = '1652727833289.png';
-			LoginMeta.create(loginMetaPostData).then(() => {
-				res.status(200).send({ status: 1, data: [], message: "User was registered successfully!" });
+			//loginMetaPostData['documents'] = '1652727833289.png';
+				LoginMeta.create(loginMetaPostData).then(() => {
+					res.status(200).send({ status: 1, data: [], message: "User was registered successfully!" });
+				}).catch(err => {
+					res.status(500).send({ status: 0, data: [], message: err.message });
+				}); 
 			}).catch(err => {
 				res.status(500).send({ status: 0, data: [], message: err.message });
-			}); 
-				
-		//});
-			
-			
-		  })
-		  .catch(err => {
+			  });
+		}).catch(err => {
 			res.status(500).send({ status: 0, data: [], message: err.message });
 		  });
-	}else{
-		res.send({ status: 0, data: [], message: "Post data is not valid." });
-	}
+		}else{
+			res.send({ status: 0, data: [], message: "Post data is not valid." });
+		}
 };
 
 /* This function is used to upload image.. */
