@@ -3,7 +3,7 @@ const cors = require("cors");
 const db = require("./app/models");
 const app = express();
 require('dotenv').config();
-
+var path = require('path');
 
 // var corsOptions = {
 //   origin: "http://localhost:8081"
@@ -23,6 +23,8 @@ app.use(express.urlencoded({ extended: true,limit: '100mb' }));
 //     console.log("Drop and re-sync db.");
 // });
 
+
+
 // simple route
 app.get("/", (req, res) => { 
   res.json({ message: "Welcome to bezkoder application." });
@@ -34,6 +36,8 @@ app.use('/api/category', require("./app/routes/category.routes"));
 app.use('/api/township', require("./app/routes/townships.routes"));
 app.use('/api/plot', require("./app/routes/plots.routes"));
 app.use('/api/booking', require("./app/routes/booking.routes"));
+
+app.use("/images", express.static(path.join(__dirname, 'images')));
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
