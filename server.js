@@ -36,6 +36,8 @@ app.use('/api/category', require("./app/routes/category.routes"));
 app.use('/api/township', require("./app/routes/townships.routes"));
 app.use('/api/plot', require("./app/routes/plots.routes"));
 app.use('/api/booking', require("./app/routes/booking.routes"));
+app.use('/api/broker', require("./app/routes/brokers.routes"));
+
 
 app.use("/images", express.static(path.join(__dirname, 'images')));
 

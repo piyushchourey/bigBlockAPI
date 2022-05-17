@@ -1,43 +1,29 @@
 const db = require("../models/index");
-const Login = db.login;
-const LoginMeta = db.LoginMeta;
+const Broker = db.broker;
 const config = require("../config/auth.config");
 const Op = db.Sequelize.Op;
 var _ = require('lodash');
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const mime = require('mime');
 
 /* This function is used to resgistered Admin user */
 const doRegister = async (req, res) =>{
-	if(!(_.isEmpty(req.body))){
-		var loginPostFilteredData = {email:null,password:null,role:null};
-		var loginPostData = _.pick(req.body, _.keys(loginPostFilteredData));
-		_.assign(loginPostData,{ 'password': bcrypt.hashSync(req.body.password, 8) });
-		var loginMetaPostData = _.omit(req.body, _.keys(loginPostFilteredData));
-		  // Save User to Database
-		  Login.create(loginPostData).then(user => {
-			_.assign(loginMetaPostData,{ 'loginId': user.id });
-			var ImageFileName =  uploadImage(req.body)
-			.then((image)=>{
-				console.log(image);
-				loginMetaPostData['documents'] = image;
-				LoginMeta.create(loginMetaPostData).then(() => {
-					res.status(200).send({ status: 1, data: [], message: "User was registered successfully!" });
-				}).catch(err => {
-					res.status(500).send({ status: 0, data: [], message: err.message });
-				}); 
-			}).catch(err => {
-				res.status(500).send({ status: 0, data: [], message: err.message });
-			  });
-		}).catch(err => {
-			res.status(500).send({ status: 0, data: [], message: err.message });
-		  });
-		}else{
-			res.send({ status: 0, data: [], message: "Post data is not valid." });
-		}
+    try{
+        if(!(_.isEmpty(req.body))){
+            var ImageFileName = await uploadImage(req.body)
+            req.body['documents'] = ImageFileName;
+            Broker.create(req.body).then(user => {
+                res.status(200).send({ status: 1, data: [], message: "Broker was registered successfully!" });
+            }).catch(err => {
+                res.status(500).send({ status: 0, data: [], message: err.message });
+              });
+        }else{
+            res.send({ status: 0, data: [], message: "Post data is not valid." });
+        }
+    }catch(err){
+        res.status(500).send({ status: 0, data: [], message: err.message });
+    }
 };
 
 /* This function is used to upload image.. */
@@ -71,8 +57,8 @@ const getAll =  async (req, res) => {
 	const first_name = req.query.first_name;
 	try{
 		var condition = first_name ? { first_name: { [Op.like]: `%${first_name}%` } } : null;
-		let userData = await LoginMeta.findAll({ where: condition, include: [Login] })
-		const promises1 =  userData.map(async (f) => {
+		let BrokerData = await Broker.findAll({ where: condition })
+		const promises1 =  BrokerData.map(async (f) => {
 			f.documents =  process.env.API_URL+'images/'+f.documents;
 			return f;
 		 })
@@ -88,22 +74,18 @@ const getAll =  async (req, res) => {
 	}
 };
 
+/*This function is used to delete broker */
 const doRemove = ( req, res ) =>{ 
 	const id = req.query.id;
-	LoginMeta.destroy({
-		where: { id: id }
-	   })
-	  .then(data => {
-		res.send({ status:1, data:[], message:"Admin deleted successfully."});
-	  })
-	  .catch(err => {
-		res.status(500).send({
-		  status :0,
-		  data : [],
-		  message:
-			err.message || "Some error occurred while retrieving tutorials."
-		});
-	  });
+    try{
+        Broker.destroy({ where: { id: id } }).then(data => {
+            res.send({ status:1, data:[], message:"Broker deleted successfully."});
+          }).catch(err => {
+            res.status(500).send({ status :0, data : [], message: err.message || "Some error occurred while retrieving tutorials." });
+        });
+    }catch(err){
+        res.status(500).send({ status :0, data : [], message: err.message || "Some error occurred while retrieving tutorials." });
+    }
 };
 
 
