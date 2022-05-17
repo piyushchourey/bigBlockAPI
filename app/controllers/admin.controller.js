@@ -34,10 +34,12 @@ const doRegister = async (req, res) =>{
 			// LoginMeta.create(loginMetaPostData).then(() => {
 			// 	res.status(200).send({ status: 1, data: [], message: "User was registered successfully!" });
 			// }); 
-			let userReg = await LoginMeta.create(loginMetaPostData)
-			// .then(() => {
-			// }); 	
-			res.status(200).send({ status: 1, data: [], message: "User was registered successfully!" });	
+			try {
+				let userReg = await LoginMeta.create(loginMetaPostData)
+				res.status(200).send({ status: 1, data: [], message: "User was registered successfully!" });	
+			} catch (error) {
+				res.status(500).send({ status: 0, data: [], message: err.message });
+			}
 		//});
 			
 			
