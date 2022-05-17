@@ -5,14 +5,14 @@ const app = express();
 require('dotenv').config();
 
 
-// var corsOptions = {
-//   origin: "http://localhost:8081"
-// };
+var corsOptions = {
+  origin: "https://api.bigblockinfra.com/"
+};
 
 
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
-app.use(cors());
+//app.use(cors());
 // parse requests of content-type - application/json
 app.use(express.json({limit: '100mb'}));
 
