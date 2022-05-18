@@ -5,29 +5,27 @@ var _ = require('lodash');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const mime = require('mime');
-const plots = db.plots;
+const Blocks = db.blocks;
 
 // Create and Save a new Township
 const create = async (req, res) => {
     // Validate request
-    if(!(_.isEmpty(req.body))){
-		var townshipPostData = req.body;
-		  // Save Township to Database
-		  console.log(townshipPostData); 
-		  	var ImageFileName = await uploadImage(req.body)
-			//   .then((image)=>{
-			// 	_.assign(townshipPostData,{ 'documents': image });
-			// });
+	try{
+		if(!(_.isEmpty(req.body))){
+			var townshipPostData = req.body;
+			var ImageFileName = await uploadImage(req.body)
 			townshipPostData['documents']= ImageFileName; 
-		  	Townships.create(townshipPostData).then(township => {
-				res.send({ status:1, data:[], message: "Township was registered successfully!" });
-			})
-		  .catch(err => {
-			res.status(500).send({ status:0, data:[], message: err.message });
-		  });
-    }else{
-    	res.send({ status:0, data:[], message: 'Post data is not valid.' });
-    }
+			Townships.create(townshipPostData).then(township => {
+					res.send({ status:1, data:[], message: "Township was registered successfully!" });
+			}).catch(err => {
+					res.status(500).send({ status:0, data:[], message: err.message });
+			});
+		}else{
+			res.send({ status:0, data:[], message: 'Post data is not valid.' });
+		}
+	}catch(err){
+		res.status(500).send({ status:0, data:[], message: err.message });
+	}
 };
 
 // Get all townships
@@ -63,7 +61,7 @@ const getAll = (req, res) => {
 	if(_.size(orConditions) > 0){
 		paramObj.where = { [Op.or]: orConditions };
 	}
-	paramObj.include = [plots]
+	paramObj.include = [Blocks]
 	Townships.findAll(paramObj).then(data => {
 		res.send({ status:1, data:data, message: '' });
 	  })

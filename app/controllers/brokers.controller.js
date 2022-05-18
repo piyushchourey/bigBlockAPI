@@ -54,10 +54,23 @@ const uploadImage = async (req, res, next) => {
 
 /*This function is used to get all data */
 const getAll =  async (req, res) => {
-	const first_name = req.query.first_name;
+    const orConditions = [];
+	const paramObj = {};
+	if(req.query.id){
+		const id = req.query.id; 
+		var brokerCondition = id ? { id: { [Op.eq]: id } } : null;
+		orConditions.push(brokerCondition);
+	}
+	if(req.query.first_name){
+		const township_name = req.query.first_name; 
+		var brokerCondition = first_name ? { first_name: { [Op.like]: `%${first_name}%` } } : null;
+		orConditions.push(brokerCondition);
+	}
+	if(_.size(orConditions) > 0){
+		paramObj.where = { [Op.and]: orConditions };
+	}
 	try{
-		var condition = first_name ? { first_name: { [Op.like]: `%${first_name}%` } } : null;
-		let BrokerData = await Broker.findAll({ where: condition })
+		let BrokerData = await Broker.findAll(paramObj)
 		const promises1 =  BrokerData.map(async (f) => {
 			f.documents =  process.env.API_URL+'images/'+f.documents;
 			return f;

@@ -12,6 +12,9 @@ module.exports = (sequelize, Sequelize) => {
         pincode : {
             type: Sequelize.INTEGER
         },
+        number_of_blocks : {
+            type: Sequelize.INTEGER
+        },
         number_of_plots : {
             type: Sequelize.INTEGER
         },
