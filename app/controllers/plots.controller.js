@@ -1,6 +1,7 @@
 const db = require("../models/index");
 const Plots = db.plots;
 const Townships = db.townships;
+const Blocks = db.blocks;
 const Op = db.Sequelize.Op;
 var _ = require('lodash');
 const bodyParser = require('body-parser');
@@ -10,23 +11,21 @@ const mime = require('mime');
 // Create and Save a new Township
 const create = async (req, res) => {
 	// Validate request
-	if(!(_.isEmpty(req.body))){
-		var PlotPostData = req.body;
-			// Save Township to Database
-			console.log(PlotPostData); 
+	try{
+		if(!(_.isEmpty(req.body))){
+			var PlotPostData = req.body;
 			var ImageFileName = await uploadImage(req.body)
-			//   .then((image)=>{
-			// 	_.assign(townshipPostData,{ 'documents': image });
-			// });
-			PlotPostData['documents']= ImageFileName; 
+			PlotPostData['documents']= ImageFileName;
 			Plots.create(PlotPostData).then(plot => {
-				res.send({ status :1, data:[], message: "Plot was registered successfully!" });
-			})
-			.catch(err => {
-			res.status(500).send({ status :0, data :[], message: err.message });
+					res.send({ status :1, data:[], message: "Plot was registered successfully!" });
+			}).catch(err => {
+				res.status(500).send({ status :0, data :[], message: err.message });
 			});
-	}else{
-		res.send({ status :0, data :[], message: "Post data is not valid." });
+		}else{
+			res.send({ status :0, data :[], message: "Post data is not valid." });
+		}
+	}catch(err){
+		res.status(500).send({ status :0, data :[], message: err.message });
 	}
 };
 
@@ -63,7 +62,9 @@ const getAll = (req, res) => {
 	if(_.size(orConditions) > 0){
 		paramObj.where = { [Op.and]: orConditions };
 	}
+	paramObj.include = [Blocks,Townships]
 	console.log(paramObj);
+	try {
 	Plots.findAll(paramObj).then(data => {
 		res.send({ status :1, data:data, message: "" });
 	  })
@@ -75,6 +76,9 @@ const getAll = (req, res) => {
 			err.message || "Some error occurred while retrieving tutorials."
 		});
 	  });
+	}catch(err){
+		res.status(500).send({ status :0, data :[], message: err.message });
+	}
 };
 
 /* This function is used to upload image.. */
@@ -103,7 +107,49 @@ const uploadImage = async (req, res, next) => {
 	}
 }
 
+const doRemove = ( req, res ) =>{ 
+	const id = req.query.id;
+	try{}catch(err){
+		res.status(500).send({ status :0, data :[], message: err.message });
+	}
+	Plots.destroy({ where: { id: id } })
+	.then(data => { res.send({ status:1, data:[], message:"Plot deleted successfully."}); })
+	 .catch(err => {
+		res.status(500).send({
+		  status :0,
+		  data : [],
+		  message:
+			err.message || "Some error occurred while retrieving tutorials."
+		});
+	  });
+};
+
+const doUpdate = async (req,res,next) =>{
+	console.log(req.body);
+	let UpdateplotDataExceptID = _.omit(req.body, ['id','townshipId','documents']);
+	let UpdateplotDataDataOfID = _.pick(req.body, ['id']);
+	try{
+		const plotExistData = await Plots.findByPk(UpdateplotDataDataOfID.id);
+		if(plotExistData){
+			await Plots.update(UpdateplotDataExceptID,{
+				where : { id : UpdateplotDataDataOfID.id } 
+			}).then(data => {
+					res.send({ status:1, data:data, message: 'Plot updated successfully.' });
+			}).catch(err => { 
+				res.status(500).send({ status :0, data :[], message: err.message || "Some error occurred while retrieving tutorials." }); 
+			});
+		}else{
+			res.status(500).send({ status :0, data :[], message: "This plot is not exist in our DB." }); 
+		}
+		
+	}catch(err){
+		res.status(500).send({ status :0, data :[], message: err.message || "Some error occurred while retrieving tutorials." }); 
+	}
+}
+
 module.exports = {
     create,
-    getAll
+    getAll,
+	doRemove,
+	doUpdate
 };

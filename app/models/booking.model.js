@@ -1,6 +1,12 @@
 module.exports = (sequelize, Sequelize) => {
     const Booking = sequelize.define("booking", {
-        plotNumber: {
+        townshipId: {
+            type: Sequelize.INTEGER
+        },
+        blockId: {
+            type: Sequelize.INTEGER
+        },
+        plotId: {
             type: Sequelize.INTEGER
         },
         client_name : {
@@ -30,9 +36,6 @@ module.exports = (sequelize, Sequelize) => {
         bookingAmount : {
             type: Sequelize.FLOAT(11)
         },
-        bookingDate : {
-            type: Sequelize.DATE
-        },
         paymentMode : {
             type : Sequelize.STRING
         },
@@ -41,6 +44,12 @@ module.exports = (sequelize, Sequelize) => {
         },
         status: {
             type: Sequelize.BOOLEAN
+        },
+        commission_type : {
+            type : Sequelize.STRING
+        },
+        commission_amount : {
+            type : Sequelize.STRING
         },
         userId :{
             type: Sequelize.INTEGER

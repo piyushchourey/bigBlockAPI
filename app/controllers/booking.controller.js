@@ -7,28 +7,29 @@ const fs = require('fs');
 const mime = require('mime');
 
 // Create and Save a new Township
-const create = (req, res) => {
-	//console.log("sdfsdf");
-    // Validate request
-    if(!(_.isEmpty(req.body))){
-		var bookingPostData = req.body;
-		  // Save Township to Database
-		  //console.log(bookingPostData); 
-		  var bookingPostFilteredData = {aadharcardDoc :null, salarySlipDoc:null, agreementDoc:null};
-		  var bookingPostFilteredData = _.pick(req.body, _.keys(bookingPostFilteredData));
-		  //console.log(bookingPostFilteredData);
-		  	// var ImageFileName = uploadImage(req.body).then((image)=>{
-			// 	_.assign(townshipPostData,{ 'documents': image });
-			// });
+const create = async (req, res) => {
+	// Validate request
+	try{
+		if(!(_.isEmpty(req.body))){
+			var bookingPostData = req.body;
+			//documents upload functionality..
+			var bookingPostFilteredData = {aadharcardDoc :null, salarySlipDoc:null, agreementDoc:null};
+			var bookingPostFilteredData1 = _.pick(req.body, _.keys(bookingPostFilteredData));
+			await uploadImage(bookingPostFilteredData1).then(imageUploadArr => {
+				console.log(imageUploadArr)
+			})
+			console.log(uploadDocObj);
 			Booking.create(bookingPostData).then(bookingData => {
 				res.send({ status:1, data:[], message: "Plot booked successfully!" });
-			})
-		  .catch(err => {
-			res.status(500).send({ status:0, data:[], message: err.message });
-		  });
-    }else{
-    	res.send({ status:0, data:[], message:  "Post data is not valid."});
-    }
+			}).catch(err => {
+				res.status(500).send({ status:0, data:[], message: err.message });
+			});
+		}else{
+			res.send({ status:0, data:[], message:  "Post data is not valid."});
+		}
+	}catch(err){
+		res.status(500).send({ status:0, data:[], message: err.message });
+	}
 };
 
 // Get all townships
@@ -71,29 +72,31 @@ const getAll = (req, res) => {
 };
 
 /* This function is used to upload image.. */
-const uploadImage = async (req, res, next) => {
+const uploadImage = async (req, res, callback) => {
 	// to declare some path to store your converted image
-	var matches = req.documents.match(/^data:([A-Za-z-+/]+);base64,(.+)$/),
-	response = {};
-	 
-	if (matches.length !== 3) {
-	return new Error('Invalid input string');
-	}
-	 
-	response.type = matches[1];
-	response.data = new Buffer(matches[2], 'base64');
-	let decodedImg = response;
-	let imageBuffer = decodedImg.data;
-	let type = decodedImg.type;
-	let extension = mime.getExtension(type); 
-	let randomName = new Date().getTime();
-	let fileName = randomName +"." + extension;
-	try {
-		fs.writeFileSync("./images/" + fileName, imageBuffer, 'utf8');
-		return fileName;
-	} catch (e) {
-		next(e); 
-	}
+	  var response = {}; 
+	_.forEach(req, async function(value, key) {
+		// to declare some path to store your converted image
+		var matches = req[key].match(/^data:([A-Za-z-+/]+);base64,(.+)$/)
+		if (matches.length !== 3) {
+			return new Error('Invalid input string');
+		}
+		let type = matches[1];
+		let imageBuffer = new Buffer(matches[2], 'base64');
+		let extension = mime.getExtension(type); 
+		let randomName = new Date().getTime();
+		let fileName = randomName +"." + extension;
+		try {
+			fs.writeFileSync("./images/" + fileName, imageBuffer, 'utf8');
+			response[key] = fileName;
+			console.log(req.length);
+			if(response.length == req.length){
+				return callback(response);
+			}
+		} catch (e) {
+			callback(e); 
+		}
+	});
 }
 
 module.exports = {

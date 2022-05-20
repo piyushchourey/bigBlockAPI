@@ -35,8 +35,12 @@ db.login.hasOne(db.LoginMeta);
 db.LoginMeta.belongsTo(db.login);
 
 
-/*Township - plots relationship */
+/*Township - blocks relationship */
 db.townships.hasMany(db.blocks);
 db.blocks.belongsTo(db.townships);
+
+/*Block - plots relationship */
+db.blocks.hasMany(db.plots);
+db.plots.belongsTo(db.blocks);
 
 module.exports = db;

@@ -5,5 +5,7 @@ var router = require("express").Router();
 
 router.post("/create", [ authJwt.verifyToken, commonServices.checkDuplicatePlotWithTownship ], plots.create);
 router.get("/getAll",[ authJwt.verifyToken ], plots.getAll);
+router.post("/update", [ authJwt.verifyToken ], plots.doUpdate);
+router.get("/remove",[ authJwt.verifyToken ], plots.doRemove);
 
 module.exports = router; 

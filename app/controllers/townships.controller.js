@@ -75,6 +75,34 @@ const getAll = (req, res) => {
 	  });
 };
 
+const doUpdate = async (req,res,next) =>{
+	console.log(req.body);
+	let UpdateTownshipDataExceptID = _.omit(req.body, ['id','township_name','documents']);
+	let UpdateTownshipDataOfID = _.pick(req.body, ['id']);
+	try{
+		const townshipExistData = await Townships.findByPk(UpdateTownshipDataOfID.id);
+		if(townshipExistData){
+			let matches = (UpdateTownshipDataExceptID.documents).match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+			if (matches.length === 3) {
+				var ImageFileName = await uploadImage(UpdateTownshipDataExceptID)
+				UpdateTownshipDataExceptID['documents']= ImageFileName; 
+			}
+			await Townships.update(UpdateTownshipDataExceptID,{
+				where : { id : UpdateTownshipDataOfID.id } 
+			}).then(data => {
+					res.send({ status:1, data:data, message: 'Township updated successfully.' });
+			}).catch(err => { 
+				res.status(500).send({ status :0, data :[], message: err.message || "Some error occurred while retrieving tutorials." }); 
+			});
+		}else{
+			res.status(500).send({ status :0, data :[], message: "This township is not exist in our DB." }); 
+		}
+		
+	}catch(err){
+		res.status(500).send({ status :0, data :[], message: err.message || "Some error occurred while retrieving tutorials." }); 
+	}
+}
+
 /* This function is used to upload image.. */
 const uploadImage = async (req, res, next) => {
 	// to declare some path to store your converted image
@@ -122,5 +150,6 @@ const doRemove = ( req, res ) =>{
 module.exports = {
     create,
     getAll,
-	doRemove
+	doRemove,
+	doUpdate
 };
