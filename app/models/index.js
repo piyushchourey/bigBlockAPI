@@ -42,5 +42,6 @@ db.blocks.belongsTo(db.townships);
 /*Block - plots relationship */
 db.blocks.hasMany(db.plots);
 db.plots.belongsTo(db.blocks);
+db.plots.belongsTo(db.townships)
 
 module.exports = db;
