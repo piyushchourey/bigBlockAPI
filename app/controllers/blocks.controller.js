@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const mime = require('mime');
 const Townships = db.townships;
+const Plots = db.plots;
 
 // Create and Save a new Township
 const create = async (req, res) => {
@@ -45,7 +46,7 @@ const getAll = (req, res) => {
 	if(_.size(orConditions) > 0){
 		paramObj.where = { [Op.or]: orConditions };
 	}
-	paramObj.include = [Townships]
+	paramObj.include = [Townships,Plots]
     try{
         Blocks.findAll(paramObj).then(data => {
             res.send({ status:1, data:data, message: '' });
