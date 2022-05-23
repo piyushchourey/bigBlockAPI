@@ -45,7 +45,7 @@ const create = async (req, res) => {
 };
 
 // Get all booking
-const getAll = (req, res) => {
+const getAll = async (req, res) => {
 	const orConditions = [];
 	const paramObj = {};
 	if(req.query.townshipId){

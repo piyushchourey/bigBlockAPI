@@ -29,7 +29,7 @@ const create = async (req, res) => {
 };
 
 // Get all blocks of township
-const getAll = (req, res) => {
+const getAll = async (req, res) => {
 	const orConditions = [];
 	const paramObj = {};
 	if(req.query.id){

@@ -30,7 +30,7 @@ const create = async (req, res) => {
 };
 
 // Get all plots 
-const getAll = (req, res) => {
+const getAll = async (req, res) => {
 	const orConditions = [];
 	const paramObj = { include: [Townships] };
 	if(req.query.id){
