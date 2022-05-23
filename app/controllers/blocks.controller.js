@@ -48,12 +48,8 @@ const getAll = (req, res) => {
 	}
 	paramObj.include = [Townships,Plots]
     try{
-        Blocks.findAll(paramObj).then(data => {
-            res.send({ status:1, data:data, message: '' });
-          })
-          .catch(err => {
-            res.status(500).send({ status :0, data :[], message: err.message || "Some error occurred while retrieving tutorials." });
-          });
+        let userData = await Blocks.findAll(paramObj)
+		res.send({ status:1, data:userData, message: '' });
     }catch(err){
         res.status(500).send({ status :0, data :[], message: err.message || "Some error occurred while retrieving tutorials." });
     }

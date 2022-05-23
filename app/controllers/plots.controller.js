@@ -65,17 +65,14 @@ const getAll = (req, res) => {
 	paramObj.include = [Blocks,Townships]
 	console.log(paramObj);
 	try {
-	Plots.findAll(paramObj).then(data => {
-		res.send({ status :1, data:data, message: "" });
-	  })
-	  .catch(err => {
-		res.status(500).send({ 
-			statu :0,
-			data:[],
-		  	message:
-			err.message || "Some error occurred while retrieving tutorials."
-		});
-	  });
+		let userData = await Plots.findAll(paramObj)
+		const promises1 =  userData.map(async (f) => {
+			f.documents =  process.env.API_URL+'images/'+f.documents;
+			return f;
+		})
+		let newArray = await Promise.all(promises1);
+		res.send({ status:1, data:newArray, message: '' });
+	  
 	}catch(err){
 		res.status(500).send({ status :0, data :[], message: err.message });
 	}

@@ -79,16 +79,15 @@ const getAll = (req, res) => {
 	}
 
 	paramObj.include = [Townships,Blocks,Plots,Brokers];
-
-	Booking.findAll(paramObj).then(data => {
-		res.send({ status:1,data:data, message:""});
-	  })
-	  .catch(err => {
-		res.status(500).send({ 
-		  message:
-			err.message || "Some error occurred while retrieving tutorials."
-		});
-	  });
+	let userData = await Booking.findAll(paramObj)
+	const promises1 =  userData.map(async (f) => {
+		f.agreementDoc =  process.env.API_URL+'images/'+f.agreementDoc;
+		f.salarySlipDoc =  process.env.API_URL+'images/'+f.salarySlipDoc;
+		f.aadharcardDoc =  process.env.API_URL+'images/'+f.aadharcardDoc;
+		return f;
+	 })
+	let newArray = await Promise.all(promises1);
+	res.send({ status:1, data:newArray, message: '' });
 };
 
 /* This function is used to upload image.. */
