@@ -5,6 +5,10 @@ var _ = require('lodash');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const mime = require('mime');
+const Townships = db.townships;
+const Blocks = db.blocks;
+const Plots = db.plots;
+const Brokers = db.broker;
 
 // Create and Save a new Township
 const create = async (req, res) => {
@@ -40,43 +44,51 @@ const create = async (req, res) => {
 	}
 };
 
-// Get all townships
+// Get all booking
 const getAll = (req, res) => {
-	// const orConditions = [];
-	// const paramObj = {};
-	// if(req.query.township_name){
-	// 	const township_name = req.query.township_name; 
-	// 	var townshipCondition = township_name ? { township_name: { [Op.like]: `%${township_name}%` } } : null;
-	// 	orConditions.push(townshipCondition);
-	// }
-	// if(req.query.state){
-	// 	const state = req.query.state;
-	// 	var stateCondition = state ? { state: { [Op.like]: `%${state}%` } } : null;
-	// 	orConditions.push(stateCondition);
-	// }
-	// if(req.query.city){
-	// 	const city = req.query.city;
-	// 	var cityCondition = city ? { city: { [Op.like]: `%${city}%` } } : null;
-	// 	orConditions.push(cityCondition);
-	// }
-	// if(req.query.status){
-	// 	const status = req.query.status;
-	// 	var statusCondition = status ? { status: { [Op.like]: `%${status}%` } } : null;
-	// 	orConditions.push(statusCondition);
-	// }
-	// console.log(orConditions);
-	// if(_.size(orConditions) > 0){
-	// 	paramObj.where = { [Op.or]: orConditions };
-	// }
-	// Townships.findAll(paramObj).then(data => {
-	// 	res.send(data);
-	//   })
-	//   .catch(err => {
-	// 	res.status(500).send({ 
-	// 	  message:
-	// 		err.message || "Some error occurred while retrieving tutorials."
-	// 	});
-	//   });
+	const orConditions = [];
+	const paramObj = {};
+	if(req.query.townshipId){
+		const townshipId = req.query.townshipId; 
+		var townshipCondition = townshipId ? { townshipId: { [Op.eq]: `%${townshipId}%` } } : null;
+		orConditions.push(townshipCondition);
+	}
+	if(req.query.blockId){
+		const blockId = req.query.blockId;
+		var blockIdCondition = blockId ? { blockId: { [Op.eq]: `%${blockId}%` } } : null;
+		orConditions.push(blockIdCondition);
+	}
+	if(req.query.plotId){
+		const plotId = req.query.plotId;
+		var plotIdCondition = plotId ? { plotId: { [Op.eq]: `%${plotId}%` } } : null;
+		orConditions.push(plotIdCondition);
+	}
+	if(req.query.status){
+		const status = req.query.status;
+		var statusCondition = status ? { status: { [Op.eq]: `%${status}%` } } : null;
+		orConditions.push(statusCondition);
+	}
+	if(req.query.userId){
+		const userId = req.query.userId;
+		var userIdCondition = userId ? { userId: { [Op.eq]: `%${userId}%` } } : null;
+		orConditions.push(userIdCondition);
+	}
+	console.log(orConditions);
+	if(_.size(orConditions) > 0){
+		paramObj.where = { [Op.or]: orConditions };
+	}
+
+	paramObj.include = [Townships,Blocks,Plots,Brokers];
+
+	Booking.findAll(paramObj).then(data => {
+		res.send(data);
+	  })
+	  .catch(err => {
+		res.status(500).send({ 
+		  message:
+			err.message || "Some error occurred while retrieving tutorials."
+		});
+	  });
 };
 
 /* This function is used to upload image.. */
@@ -135,7 +147,25 @@ const sigleUploadImage = async (req, res, next) => {
 	}
 }
 
+const doRemove = ( req, res ) =>{ 
+	const id = req.query.id;
+	try{}catch(err){
+		res.status(500).send({ status :0, data :[], message: err.message });
+	}
+	Booking.destroy({ where: { id: id } })
+	.then(data => { res.send({ status:1, data:[], message:"Booking Entry deleted successfully."}); })
+	 .catch(err => {
+		res.status(500).send({
+		  status :0,
+		  data : [],
+		  message:
+			err.message || "Some error occurred while retrieving tutorials."
+		});
+	  });
+};
+
 module.exports = {
     create,
-    getAll
+    getAll,
+	doRemove
 };

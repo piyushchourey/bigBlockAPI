@@ -3,7 +3,7 @@ const { authJwt, commonServices, verifySignUp } = require("../middlewares");
 
 var router = require("express").Router();
 
-router.post("/register",  booking.create);
-// router.get("/getAll",[ authJwt.verifyToken ], townships.getAll);
-//[ authJwt.verifyToken, commonServices.plotVerify, verifySignUp.isExistUser  ],
+router.post("/register", [ authJwt.verifyToken ], booking.create);
+router.get("/getAll", [ authJwt.verifyToken ], booking.getAll);
+router.delete("/remove",[ authJwt.verifyToken ], booking.doRemove);
 module.exports = router; 

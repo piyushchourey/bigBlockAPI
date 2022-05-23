@@ -42,6 +42,11 @@ db.blocks.belongsTo(db.townships);
 /*Block - plots relationship */
 db.blocks.hasMany(db.plots);
 db.plots.belongsTo(db.blocks);
-db.plots.belongsTo(db.townships)
+
+db.booking.belongsTo(db.townships);
+db.booking.belongsTo(db.blocks);
+db.booking.belongsTo(db.plots);
+db.booking.belongsTo(db.broker);
+
 
 module.exports = db;

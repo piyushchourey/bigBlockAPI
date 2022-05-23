@@ -51,7 +51,7 @@ module.exports = (sequelize, Sequelize) => {
         commission_amount : {
             type : Sequelize.STRING
         },
-        userId :{
+        brokerId :{
             type: Sequelize.INTEGER
         }
     });
