@@ -81,7 +81,7 @@ const getAll = (req, res) => {
 	paramObj.include = [Townships,Blocks,Plots,Brokers];
 
 	Booking.findAll(paramObj).then(data => {
-		res.send(data);
+		res.send({ status:1,data:data, message:""});
 	  })
 	  .catch(err => {
 		res.status(500).send({ 
