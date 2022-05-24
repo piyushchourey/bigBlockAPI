@@ -17,8 +17,9 @@ var storage = multer.diskStorage({
 	},
 	filename: function (req, file, cb) {
 		console.log('filenmeaff')
-
-	  cb(null, Date.now()+file.originalname)
+		let filenqme =  Date.now()+file.originalname
+		req['filename2'] = filenqme
+	  cb(null, filenqme)
 	}
   })
   
@@ -201,7 +202,10 @@ const bulkImport = async ( req, res ) =>{
 			})
 		  })
 		  console.log('data',data)
-		return;
+		return res.send({
+			state :1,
+			data:req['filename2']
+		})
 		let fileData = req.files.importFile;
 		let randomName = new Date().getTime();
 		let newpath = 'excel/'+randomName+'_'+fileData.name;
