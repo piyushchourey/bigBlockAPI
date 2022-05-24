@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const mime = require('mime');
 const Blocks = db.blocks;
+const XLSX = require("xlsx"); 
 
 // Create and Save a new Township
 const create = async (req, res) => {
@@ -81,7 +82,6 @@ const getAll = async (req, res) => {
 };
 
 const doUpdate = async (req,res,next) =>{
-	console.log(req.body);
 	let UpdateTownshipDataExceptID = _.omit(req.body, ['id','township_name','documents']);
 	let UpdateTownshipDataOfID = _.pick(req.body, ['id']);
 	try{
@@ -152,9 +152,44 @@ const doRemove = ( req, res ) =>{
 	  });
 };
 
+const bulkImport = async ( req, res ) =>{
+	try{
+		let fileData = req.files.importFile;
+		let randomName = new Date().getTime();
+		let newpath = 'excel/'+randomName+'_'+fileData.name;
+		fs.rename(fileData.name, newpath, async function () {
+			const wb = XLSX.readFile(newpath);
+			const sheets = wb.SheetNames;
+			
+			if(sheets.length > 0) {
+				const data = XLSX.utils.sheet_to_json(wb.Sheets[sheets[0]]);
+				console.log(data);
+				const townships = data.map(row => ({
+					township_name: row['Township Name'],
+					state: row['State'],
+					city: row['City'],
+					pincode: row['Pincode'],
+					number_of_blocks: row['Number of blocks'],
+					number_of_plots: row['Number of plots'],
+					total_size_of_township: row['Total size of township'],
+					colonizer: row['Colonizer'],
+					colonizer_status: row['Colony status'],
+					description: row['Description'],
+					status: 1
+				}))
+				await Townships.bulkCreate(townships); 
+				res.send({ status:1, data:[], message: "Township was registered successfully!" });
+			}
+		})
+	}catch(err){
+		res.status(500).send({ status :0, data : [], message: err.message || "Some error occurred while retrieving tutorials." });
+	}
+};
+
 module.exports = {
     create,
     getAll,
 	doRemove,
-	doUpdate
+	doUpdate,
+	bulkImport
 };

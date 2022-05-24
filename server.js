@@ -1,4 +1,5 @@
 const express = require("express");
+const fileupload = require("express-fileupload");
 const cors = require("cors");
 const db = require("./app/models");
 const app = express();
@@ -12,13 +13,13 @@ var path = require('path');
 
 // app.use(cors(corsOptions));
 
-app.use(cors());
+app.use(cors()); 
 // parse requests of content-type - application/json
 app.use(express.json({limit: '100mb'}));
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true,limit: '100mb' }));
-
+app.use(fileupload());
 // db.sequelize.sync({ force: true }).then(() => {
 //     console.log("Drop and re-sync db.");
 // });
