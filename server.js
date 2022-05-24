@@ -43,6 +43,7 @@ app.use('/api/broker', require("./app/routes/brokers.routes"));
 
 
 app.use("/images", express.static(path.join(__dirname, 'images')));
+app.use("/excel", express.static(path.join(__dirname, 'excel')));
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
