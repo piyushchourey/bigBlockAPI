@@ -7,7 +7,7 @@ router.post("/create", [ authJwt.verifyToken, commonServices.checkDuplicateTowns
 router.get("/getAll",[ authJwt.verifyToken ], townships.getAll);
 router.put("/update", [ authJwt.verifyToken ], townships.doUpdate);
 router.delete("/remove",[ authJwt.verifyToken ], townships.doRemove);
-router.post("/import", townships.bulkImport);
+router.post("/import", [ authJwt.verifyToken ], townships.bulkImport);
 
 module.exports = router; 
 
