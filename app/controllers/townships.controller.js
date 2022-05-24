@@ -201,18 +201,9 @@ const bulkImport = async ( req, res ) =>{
 			  return resolve('');
 			})
 		  })
-		  console.log('data',data)
-		return res.send({
-			state :1,
-			data:req['filename2']
-		})
-		let fileData = req.files.importFile;
-		let randomName = new Date().getTime();
-		let newpath = 'excel/'+randomName+'_'+fileData.name;
-		fs.rename(fileData.name, newpath, async function () {
+		  	let newpath =  process.env.API_URL+'excel/'+req['filename2'];
 			const wb = XLSX.readFile(newpath);
 			const sheets = wb.SheetNames;
-			
 			if(sheets.length > 0) {
 				const data = XLSX.utils.sheet_to_json(wb.Sheets[sheets[0]]);
 				console.log(data);
@@ -232,7 +223,6 @@ const bulkImport = async ( req, res ) =>{
 				await Townships.bulkCreate(townships); 
 				res.send({ status:1, data:[], message: "Township was registered successfully!" });
 			}
-		})
 	}catch(err){
 		res.status(500).send({ status :0, data : [], message: err.message || "Some error occurred while retrieving tutorials." });
 	}
