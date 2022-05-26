@@ -30,6 +30,7 @@ const create = async (req, res) => {
 			bookingPostData['aadharcardDoc'] = newArray[0];
 			bookingPostData['salarySlipDoc'] = newArray[1];
 			bookingPostData['agreementDoc'] = newArray[2];
+			bookingPostData['remainingAmount'] = req.body.plotAmount - req.body.bookingAmount;
 			// return false;
 			Booking.create(bookingPostData).then(bookingData => {
 				res.send({ status:1, data:[], message: "Plot booked successfully!" });

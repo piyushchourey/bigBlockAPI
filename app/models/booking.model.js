@@ -36,6 +36,9 @@ module.exports = (sequelize, Sequelize) => {
         bookingAmount : {
             type: Sequelize.FLOAT(11)
         },
+        remainingAmount : {
+            type: Sequelize.FLOAT(11)
+        },
         paymentMode : {
             type : Sequelize.STRING
         },
@@ -46,6 +49,9 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.BOOLEAN
         },
         commission_type : {
+            type : Sequelize.STRING
+        },
+        commission_type_amount : {
             type : Sequelize.STRING
         },
         commission_amount : {

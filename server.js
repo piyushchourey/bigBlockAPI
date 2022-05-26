@@ -40,7 +40,7 @@ app.use('/api/plot', require("./app/routes/plots.routes"));
 app.use('/api/block', require("./app/routes/blocks.routes"));
 app.use('/api/booking', require("./app/routes/booking.routes"));
 app.use('/api/broker', require("./app/routes/brokers.routes"));
-
+app.use('/api/report', require("./app/routes/report.routes"));
 
 app.use("/images", express.static(path.join(__dirname, 'images')));
 app.use("/excel", express.static(path.join(__dirname, 'excel')));
