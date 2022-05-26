@@ -7,6 +7,40 @@ const fs = require('fs');
 const mime = require('mime');
 const Townships = db.townships;
 const Plots = db.plots;
+const XLSX = require("xlsx"); 
+const {  commonServices } = require("../middlewares");
+var multer  = require('multer');
+
+var storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, './excel/')
+	},
+	filename: function (req, file, cb) {
+		console.log('filenmeaff')
+		let filenqme =  Date.now()+file.originalname
+		req['filename2'] = filenqme
+	  cb(null, filenqme)
+	}
+  })
+  
+  const fileFilter=(req, file, cb)=>{
+	if(file.mimetype ==='csv' || file.mimetype ==='xls'){
+		cb(null,true);
+	}else{
+		cb(null, false);
+	}
+}
+  
+  var upload = multer({ 
+	storage:storage,
+	limits:{
+		fileSize: 1024 * 1024 * 5
+	},
+	fileFilter:fileFilter
+  });
+  
+const singleFileUpload = upload.single("importFile")
+
 
 // Create and Save a new Township
 const create = async (req, res) => {
@@ -69,8 +103,40 @@ const doRemove = ( req, res ) =>{
     }
 };
 
+const bulkImport = async ( req, res ) =>{
+	try{
+		console.log(req.files);
+		let data = await new Promise((resolve, reject) => {
+			console.log('runnn')
+			return singleFileUpload(req, res, err => {
+				console.log(err) 
+				// console.log(res)
+				if (err) return reject(err)
+			  		return resolve('');
+			})
+		  })
+		  	let newpath =  '/excel/'+req['filename2'];
+			const wb = XLSX.readFile(newpath);
+			const sheets = wb.SheetNames;
+			if(sheets.length > 0) {
+				const data = XLSX.utils.sheet_to_json(wb.Sheets[sheets[0]]);
+				console.log(data);
+				const blockData = data.map(row => ({
+					township_name: row['Township Name'],
+					state: row['Block Name'],
+					city: row['Size'],
+				}))
+				await Blocks.bulkCreate(blockData); 
+				res.send({ status:1, data:[], message: "Block was registered successfully!" });
+			}
+	}catch(err){
+		res.status(500).send({ status :0, data : [], message: err.message || "Some error occurred while retrieving tutorials." });
+	}
+};
+
 module.exports = {
     create,
     getAll,
-	doRemove
+	doRemove,
+	bulkImport
 };
