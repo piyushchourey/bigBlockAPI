@@ -3,6 +3,6 @@ const { verifySignUp, authJwt} = require("../middlewares");
 
 var router = require("express").Router();
 
-router.get("/getAll", report.getReport);
+router.get("/getAll", [ authJwt.verifyToken ], report.getReport);
 
 module.exports = router;
