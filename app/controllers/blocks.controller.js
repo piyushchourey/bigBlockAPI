@@ -122,9 +122,9 @@ const bulkImport = async ( req, res ) =>{
 				const data = XLSX.utils.sheet_to_json(wb.Sheets[sheets[0]]);
 				console.log(data);
 				const blockData = data.map(row => ({
-					township_name: row['Township Name'],
-					state: row['Block Name'],
-					city: row['Size'],
+					townshipId: row['Township Name'],
+					name: row['Block Name'],
+					size: row['Size'],
 				}))
 				await Blocks.bulkCreate(blockData); 
 				res.send({ status:1, data:[], message: "Block was registered successfully!" });
