@@ -28,7 +28,8 @@ db.plots = require("./plots.model.js")(sequelize, Sequelize);
 db.blocks = require("./blocks.model.js")(sequelize, Sequelize);
 db.booking = require("./booking.model.js")(sequelize, Sequelize);
 db.broker = require("./brokers.model.js")(sequelize, Sequelize);
-
+db.state = require("./state.model.js")(sequelize, Sequelize);
+db.city = require("./city.model.js")(sequelize, Sequelize);
 
 /*Login - user meta relationship */
 db.login.hasOne(db.LoginMeta);
@@ -49,5 +50,8 @@ db.booking.belongsTo(db.blocks);
 db.booking.belongsTo(db.plots);
 db.booking.belongsTo(db.broker);
 
+/*State - city relationship */
+db.state.hasMany(db.city);
+db.city.belongsTo(db.state);
 
 module.exports = db;

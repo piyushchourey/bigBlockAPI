@@ -1,6 +1,8 @@
 const db = require("../models/index");
 const Login = db.login;
 const LoginMeta = db.LoginMeta;
+const State = db.state;
+const City = db.city;
 const config = require("../config/auth.config");
 const Op = db.Sequelize.Op;
 var _ = require('lodash');
@@ -106,9 +108,32 @@ const doRemove = ( req, res ) =>{
 	  });
 };
 
+const getStates = async ( req, res ) =>{
+	const id = req.query.id;
+	try{
+		var condition = id ? { id: { [Op.eq]: `${id}` } } : null;
+		let stateData = await State.findAll({ where: condition })
+		res.send({ status:1,data:stateData, message:""});
+	}catch(err){
+		res.status(500).send({ status :0, data : [], message: err.message || "Some error occurred while retrieving tutorials." });
+	}
+}
+
+const getCitiesByState = async ( req, res ) =>{
+	const stateId = req.query.stateId;
+	try{
+		var condition = stateId ? { stateId: { [Op.eq]: `${stateId}` } } : null;
+		let cityData = await City.findAll({ where: condition, include : [{model: State, attributes:['name']}] })
+		res.send({ status:1,data:cityData, message:""});
+	}catch(err){
+		res.status(500).send({ status :0, data : [], message: err.message || "Some error occurred while retrieving tutorials." });
+	}
+}
 
 module.exports = {
   doRegister,
   getAll,
-  doRemove
+  doRemove,
+  getStates,
+  getCitiesByState
 }
