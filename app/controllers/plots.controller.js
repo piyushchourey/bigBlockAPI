@@ -195,9 +195,9 @@ const bulkImport = async ( req, res ) =>{
 				const PlotData = data.map(row => ({
 					townshipId: row['Township Name'],
 					blockId: row['Block Name'],
-					plot_number: row['Plot Name'],
+					plot_number: row['Plot number'],
 					dimesion: row['Size'],
-					plot_status: row['Plot Status'],
+					plot_status: row['Plot status'],
 					selling_amount: row['Selling Amount'],
 					description: row['Description'],
 				}))
