@@ -70,7 +70,7 @@ const getReport = async (req, res) => {
         }).then(result =>res.send({ status:1, data:result, message: '' }))
 };
 
-const getDashboardWidgetData= async (req, res) => {
+const getDashboardWidgetData = async (req, res) => {
 	let responseObj = {};
 	try{
 		let townshipsData = await Townships.findAll({
@@ -101,14 +101,33 @@ const getDashboardWidgetData= async (req, res) => {
 		responseObj.total_bookings = bookingData;
 
 		res.send({ status:1, data:responseObj, message: '' });
-		
+
 	}catch(err){
 		res.send({ status:0, data:[], message: err.message })
 	}
-
 };
+
+const getDashboardReportChart = async (req, res) =>{
+	try{
+		/** Total Plots **/
+		let plotsData = await Booking.findAll({
+			attributes:[
+				[ Sequelize.fn('YEAR', Sequelize.col('createdAt')), 'Year'],
+				[ Sequelize.fn('MONTH', Sequelize.col('createdAt')), 'Month'],
+				[ Sequelize.fn('MONTHNAME', Sequelize.col('createdAt')), 'Month Name'],
+				[ Sequelize.fn('Count', Sequelize.col('id')), 'total_booking']
+			],
+			group : ['Month','Year']
+		});
+		res.send({ status:1, data:plotsData, message: '' });
+
+	}catch(err){
+		res.send({ status:0, data:[], message: err.message })
+	}
+}
 
 module.exports = {
     getReport,
-	getDashboardWidgetData
+	getDashboardWidgetData,
+	getDashboardReportChart
 };
