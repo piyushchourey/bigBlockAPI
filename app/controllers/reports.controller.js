@@ -37,13 +37,10 @@ const getReport = async (req, res) => {
 		var userIdCondition = userId ? { userId: { [Op.eq]: `%${userId}%` } } : null;
 		orConditions.push(userIdCondition);
 	}
-	console.log(orConditions);
 	if(_.size(orConditions) > 0){
 		paramObj.where = { [Op.or]: orConditions };
 	}
 
-	//paramObj.include = [Townships,Blocks,Plots,Brokers];
-	//let reportData = await Booking.findAll(paramObj)
     if(req.query.filteredBy == "townships"){
         paramObj.include =  [{model: Townships, attributes:['township_name']}];
         paramObj.group = ['booking.townshipId'];
@@ -73,6 +70,45 @@ const getReport = async (req, res) => {
         }).then(result =>res.send({ status:1, data:result, message: '' }))
 };
 
+const getDashboardWidgetData= async (req, res) => {
+	let responseObj = {};
+	try{
+		let townshipsData = await Townships.findAll({
+			attributes:[
+				[ Sequelize.fn('Count', Sequelize.col('id')), 'count']]
+		});
+		responseObj.total_townships = townshipsData;
+
+		/** Total brokers **/
+		let brokersData = await Brokers.findAll({
+			attributes:[
+				[ Sequelize.fn('Count', Sequelize.col('id')), 'count']]
+		});
+		responseObj.total_brokers = brokersData;
+
+		/** Total Plots **/
+		let plotsData = await Plots.findAll({
+			attributes:[
+				[ Sequelize.fn('Count', Sequelize.col('id')), 'count']]
+		});
+		responseObj.total_plots = plotsData;
+
+		/** Total Bookings **/
+		let bookingData = await Booking.findAll({
+			attributes:[
+				[ Sequelize.fn('Count', Sequelize.col('id')), 'count']]
+		});
+		responseObj.total_bookings = bookingData;
+
+		res.send({ status:1, data:responseObj, message: '' });
+		
+	}catch(err){
+		res.send({ status:0, data:[], message: err.message })
+	}
+
+};
+
 module.exports = {
-    getReport
+    getReport,
+	getDashboardWidgetData
 };
