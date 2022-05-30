@@ -1,0 +1,12 @@
+Township Name,Block Name,Plot number,Size,Plot status,Selling Amount,Description
+5,16,101,15*40,New,2200000,Demo
+5,17,102,15*40,New,2200000,Demo
+5,18,103,15*40,New,2200000,Demo
+5,19,104,15*40,New,2800000,Demo
+5,20,105,15*40,New,2800000,Demo
+6,21,106,20*40,New,2200000,Demo
+6,22,107,20*40,New,2500000,Demo
+6,23,108,20*40,Resell,2500000,Demo
+7,24,109,30*40,Resell,2500000,Demo
+7,25,110,30*40,Resell,2900000,Demo
+7,26,111,30*40,Resell,2900000,Demo
