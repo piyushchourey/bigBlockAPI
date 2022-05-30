@@ -117,14 +117,16 @@ const getAll = async (req, res) => {
 };
 
 const doUpdate = async (req,res,next) =>{
+	const Postdata = req.body;
 	let UpdateTownshipDataExceptID = _.omit(req.body, ['id','township_name','documents']);
 	let UpdateTownshipDataOfID = _.pick(req.body, ['id']);
 	try{
 		const townshipExistData = await Townships.findByPk(UpdateTownshipDataOfID.id);
+		//console.log(townshipExistData);
 		if(townshipExistData){
-			let matches = (UpdateTownshipDataExceptID.documents).match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+			let matches = (Postdata.documents).match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
 			if (matches.length === 3) {
-				var ImageFileName = await uploadImage(UpdateTownshipDataExceptID)
+				var ImageFileName = await uploadImage(Postdata)
 				UpdateTownshipDataExceptID['documents']= ImageFileName; 
 			}
 			await Townships.update(UpdateTownshipDataExceptID,{
@@ -137,7 +139,6 @@ const doUpdate = async (req,res,next) =>{
 		}else{
 			res.status(500).send({ status :0, data :[], message: "This township is not exist in our DB." }); 
 		}
-		
 	}catch(err){
 		res.status(500).send({ status :0, data :[], message: err.message || "Some error occurred while retrieving tutorials." }); 
 	}
