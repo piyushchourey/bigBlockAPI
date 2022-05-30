@@ -125,7 +125,7 @@ const doUpdate = async (req,res,next) =>{
 		//console.log(townshipExistData);
 		if(townshipExistData){
 			let matches = (Postdata.documents).match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
-			if (matches.length === 3) {
+			if (matches && matches.length === 3) {
 				var ImageFileName = await uploadImage(Postdata)
 				UpdateTownshipDataExceptID['documents']= ImageFileName; 
 			}
