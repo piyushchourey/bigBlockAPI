@@ -16,6 +16,9 @@ const create = async (req, res) => {
 	try{
 		if(!(_.isEmpty(req.body))){
 			var bookingPostData = req.body;
+			if(bookingPostData.plotAmount < bookingPostData.bookingAmount){
+				res.send({ status:0, data:[], message:  "Please enter valid plot amount."});
+			}
 			//documents upload functionality..
 			var bookingPostFilteredData = {aadharcardDoc :null, salarySlipDoc:null, agreementDoc:null};
 			var bookingPostFilteredData1 = _.pick(req.body, _.keys(bookingPostFilteredData));
@@ -49,19 +52,24 @@ const create = async (req, res) => {
 const getAll = async (req, res) => {
 	const orConditions = [];
 	const paramObj = {};
+	if(req.query.id){
+		const bookingId = req.query.id; 
+		var townshipCondition = bookingId ? { bookingId: { [Op.eq]: `${bookingId}` } } : null;
+		orConditions.push(townshipCondition);
+	}
 	if(req.query.townshipId){
 		const townshipId = req.query.townshipId; 
-		var townshipCondition = townshipId ? { townshipId: { [Op.eq]: `%${townshipId}%` } } : null;
+		var townshipCondition = townshipId ? { townshipId: { [Op.eq]: `${townshipId}` } } : null;
 		orConditions.push(townshipCondition);
 	}
 	if(req.query.blockId){
 		const blockId = req.query.blockId;
-		var blockIdCondition = blockId ? { blockId: { [Op.eq]: `%${blockId}%` } } : null;
+		var blockIdCondition = blockId ? { blockId: { [Op.eq]: `${blockId}` } } : null;
 		orConditions.push(blockIdCondition);
 	}
 	if(req.query.plotId){
 		const plotId = req.query.plotId;
-		var plotIdCondition = plotId ? { plotId: { [Op.eq]: `%${plotId}%` } } : null;
+		var plotIdCondition = plotId ? { plotId: { [Op.eq]: `${plotId}` } } : null;
 		orConditions.push(plotIdCondition);
 	}
 	if(req.query.status){
@@ -71,7 +79,7 @@ const getAll = async (req, res) => {
 	}
 	if(req.query.userId){
 		const userId = req.query.userId;
-		var userIdCondition = userId ? { userId: { [Op.eq]: `%${userId}%` } } : null;
+		var userIdCondition = userId ? { userId: { [Op.eq]: `${userId}` } } : null;
 		orConditions.push(userIdCondition);
 	}
 	console.log(orConditions);
@@ -164,8 +172,43 @@ const doRemove = ( req, res ) =>{
 	  });
 };
 
+/** This function is used to update booking data **/
+const doUpdate = async (req,res,next) =>{
+	const Postdata = req.body;
+	console.log(Postdata);
+	let UpdateBookingDataExceptID = _.omit(req.body, ['townshipId','blockId','plotId','aadharcardDoc','salarySlipDoc','agreementDoc','commission_type_amount']);
+	let UpdateBookingDataOfID = _.pick(req.body, ['id']);
+	try{
+		if(Postdata.plotAmount < Postdata.bookingAmount){
+			res.send({ status:0, data:[], message:  "Please enter valid plot amount."});
+		}
+		const bookingExistData = await Booking.findByPk(UpdateBookingDataOfID.id);
+		console.log(bookingExistData);
+		if(bookingExistData){
+			// let matches = (Postdata.documents).match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+			// if (matches.length === 3) {
+			// 	var ImageFileName = await uploadImage(Postdata)
+			// 	UpdateTownshipDataExceptID['documents']= ImageFileName; 
+			// }
+			await Booking.update(UpdateBookingDataExceptID,{
+				where : { id : UpdateBookingDataOfID.id } 
+			}).then(data => {
+					res.send({ status:1, data:data, message: 'Booking updated successfully.' });
+			}).catch(err => { 
+				res.status(500).send({ status :0, data :[], message: err.message || "Some error occurred while retrieving tutorials." }); 
+			});
+		}else{
+			res.status(500).send({ status :0, data :[], message: "This booking ID is not exist in our DB." }); 
+		}
+	}catch(err){
+		res.status(500).send({ status :0, data :[], message: err.message || "Some error occurred while retrieving tutorials." }); 
+	}
+}
+
+
 module.exports = {
     create,
     getAll,
+	doUpdate,
 	doRemove
 };

@@ -60,6 +60,7 @@ const getReport = async (req, res) => {
 
     Booking.findAll({
         attributes:[
+			'description',
             [ Sequelize.fn('SUM', Sequelize.col('bookingAmount')), 'bookingAmount'],
             [ Sequelize.fn('SUM', Sequelize.col('plotAmount')), 'plotAmount'],
             [ Sequelize.fn('SUM', Sequelize.col('commission_amount')), 'commission_amount'],
@@ -106,20 +107,32 @@ const getDashboardWidgetData = async (req, res) => {
 		res.send({ status:0, data:[], message: err.message })
 	}
 };
-
+ 
 const getDashboardReportChart = async (req, res) =>{
+	const response = { data:[], label:'Booking', lable:[]};
 	try{
 		/** Total Plots **/
 		let plotsData = await Booking.findAll({
 			attributes:[
 				[ Sequelize.fn('YEAR', Sequelize.col('createdAt')), 'Year'],
 				[ Sequelize.fn('MONTH', Sequelize.col('createdAt')), 'Month'],
-				[ Sequelize.fn('MONTHNAME', Sequelize.col('createdAt')), 'Month Name'],
+				[ Sequelize.fn('MONTHNAME', Sequelize.col('createdAt')), 'MonthName'],
 				[ Sequelize.fn('Count', Sequelize.col('id')), 'total_booking']
 			],
 			group : ['Month','Year']
 		});
-		res.send({ status:1, data:plotsData, message: '' });
+
+		data = _.pick(plotsData.dataValues,'total_booking');
+
+		console.log(data);
+		const promises1 =  plotsData.map(async (f) => {
+			console.log(f.total_booking);
+			response.data.push(f.total_booking);
+			response.lable.push(f.MonthName);
+			return response;
+		 })
+		let newArray = await Promise.all(promises1);
+		res.send({ status:1, data:newArray, message: '' });
 
 	}catch(err){
 		res.send({ status:0, data:[], message: err.message })

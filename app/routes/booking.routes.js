@@ -5,5 +5,7 @@ var router = require("express").Router();
 
 router.post("/register", [ authJwt.verifyToken ], booking.create);
 router.get("/getAll", [ authJwt.verifyToken ], booking.getAll);
+router.put("/update", [ authJwt.verifyToken ], booking.doUpdate);
 router.delete("/remove",[ authJwt.verifyToken ], booking.doRemove);
+
 module.exports = router; 
