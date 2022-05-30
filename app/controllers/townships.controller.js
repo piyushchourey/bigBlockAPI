@@ -1,4 +1,4 @@
-const db = require("../models/index");
+const db = require("../models/index"); 
 const Townships = db.townships;
 const Op = db.Sequelize.Op;
 var _ = require('lodash');
@@ -10,7 +10,7 @@ const XLSX = require("xlsx");
 const {  commonServices } = require("../middlewares");
 var multer  = require('multer');
 
-var storage = multer.diskStorage({
+var storage = multer.diskStorage({ 
 	destination: function (req, file, cb) {
 		// console.log('test123')
 	  cb(null, './excel/')
@@ -201,7 +201,7 @@ const bulkImport = async ( req, res ) =>{
 			  return resolve('');
 			})
 		  })
-		  	let newpath =  '/excel/'+req['filename2'];
+		  	let newpath =  'excel/'+req['filename2'];
 			const wb = XLSX.readFile(newpath);
 			const sheets = wb.SheetNames;
 			if(sheets.length > 0) {
