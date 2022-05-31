@@ -92,7 +92,7 @@ const getAll = async (req, res) => {
 	const paramObj = {};
 	if(req.query.id){
 		const bookingId = req.query.id; 
-		var townshipCondition = bookingId ? { bookingId: { [Op.eq]: `${bookingId}` } } : null;
+		var townshipCondition = bookingId ? { id: { [Op.eq]: `${bookingId}` } } : null;
 		orConditions.push(townshipCondition);
 	}
 	if(req.query.townshipId){
