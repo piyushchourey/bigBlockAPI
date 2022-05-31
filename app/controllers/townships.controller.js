@@ -150,7 +150,7 @@ const uploadImage = async (req, res, next) => {
 	var matches = req.documents.match(/^data:([A-Za-z-+/]+);base64,(.+)$/),
 	response = {};
 	 
-	if (matches.length !== 3) {
+	if (matches && matches.length !== 3) {
 	return new Error('Invalid input string');
 	}
 	 

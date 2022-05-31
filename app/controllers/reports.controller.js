@@ -122,9 +122,10 @@ const getDashboardReportChart = async (req, res) =>{
 			group : ['Month','Year']
 		});
 
-		data = _.pick(plotsData.dataValues,'total_booking');
+		//data = _.pick(plotsData.dataValues,'total_booking');
 
-		console.log(data);
+		console.log(plotsData);
+		plotsData = JSON.parse(JSON.stringify(plotsData))
 		const promises1 =  plotsData.map(async (f) => {
 			console.log(f.total_booking);
 			response.data.push(f.total_booking);
