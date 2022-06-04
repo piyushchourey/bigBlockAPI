@@ -204,7 +204,7 @@ const bulkImport = async ( req, res ) =>{
 			  return resolve('');
 			})
 		  })
-		  	let newpath =  '/excel/'+req['filename2'];
+		  	let newpath =  'excel/'+req['filename2'];
 			const wb = XLSX.readFile(newpath);
 			const sheets = wb.SheetNames;
 			if(sheets.length > 0) {
