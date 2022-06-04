@@ -9,6 +9,44 @@ const Townships = db.townships;
 const Blocks = db.blocks;
 const Plots = db.plots;
 const Brokers = db.broker;
+var nodemailer = require('nodemailer');
+
+var mail = nodemailer.createTransport({
+	service: 'gmail',
+	auth: {
+	  user: 'piyushchourey11@gmail.com',
+	  pass: 'bfdyfqojiuicewuv'
+	}
+  });
+
+sentEmail = (req,res,next) =>{
+	try{
+		if(!(_.isEmpty(req.body))){
+			var mailOptions = {
+				from: 'piyushchourey11@gmail.com',
+				to: req.body.toEmail, //vyas19vishakha@gmail.com
+				subject: req.body.subject,
+				html: '<h1>Welcome Bigblock</h1>' ,
+				attachments: [{
+					filename: req.body.subject+".txt",
+					content: req.body.content
+				}]
+			}
+			/* Send an email method */
+			mail.sendMail(mailOptions, function(error, info){
+				if (error) {
+					res.status(500).send({ status :0, data :[], message: error || "Some error occurred while retrieving tutorials." }); 
+				} else {
+					res.status(200).send({ status :1, data :[], message: "Email sent: "+ info.response }); 
+				}
+			});
+		}
+	}catch(err){
+		res.status(500).send({ status :0, data :[], message: err.message || "Some error occurred while retrieving tutorials." }); 
+	}
+}
+
+
 
 // Create and Save a new Township
 const create = async (req, res) => {
@@ -210,5 +248,6 @@ module.exports = {
     create,
     getAll,
 	doUpdate,
-	doRemove
+	doRemove,
+	sentEmail
 };
