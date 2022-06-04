@@ -9,6 +9,8 @@ const Blocks = db.blocks;
 const XLSX = require("xlsx"); 
 const {  commonServices } = require("../middlewares");
 var multer  = require('multer');
+const States = db.state;
+const city = db.city;
 
 var storage = multer.diskStorage({
 	destination: function (req, file, cb) {
@@ -97,7 +99,7 @@ const getAll = async (req, res) => {
 	if(_.size(orConditions) > 0){
 		paramObj.where = { [Op.or]: orConditions };
 	}
-	paramObj.include = [Blocks]
+	paramObj.include = [Blocks,States,city]
 	try{
 		let userData = await Townships.findAll(paramObj)
 		const promises1 =  userData.map(async (f) => {

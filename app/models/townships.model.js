@@ -3,11 +3,11 @@ module.exports = (sequelize, Sequelize) => {
         township_name : {
             type: Sequelize.STRING
         },
-        state : {
-            type: Sequelize.STRING
+        stateId : {
+            type: Sequelize.BIGINT
         },
-        city : {
-            type: Sequelize.STRING
+        cityId : {
+            type: Sequelize.BIGINT
         },
         pincode : {
             type: Sequelize.INTEGER

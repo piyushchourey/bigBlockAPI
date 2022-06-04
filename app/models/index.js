@@ -39,6 +39,14 @@ db.LoginMeta.belongsTo(db.login);
 /*Township - blocks relationship */
 db.townships.hasMany(db.blocks);
 db.blocks.belongsTo(db.townships);
+db.townships.belongsTo(db.state,{
+  foreignKey : 'stateId',
+  targetKey : 'id'
+});
+db.townships.belongsTo(db.city,{
+  foreignKey : 'cityId',
+  targetKey : 'id'
+}); 
 
 /*Block - plots relationship */
 db.blocks.hasMany(db.plots);
