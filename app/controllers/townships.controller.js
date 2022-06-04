@@ -9,6 +9,8 @@ const Blocks = db.blocks;
 const XLSX = require("xlsx"); 
 const {  commonServices } = require("../middlewares");
 var multer  = require('multer');
+const States = db.state;
+const city = db.city;
 
 var storage = multer.diskStorage({
 	destination: function (req, file, cb) {
@@ -97,7 +99,7 @@ const getAll = async (req, res) => {
 	if(_.size(orConditions) > 0){
 		paramObj.where = { [Op.or]: orConditions };
 	}
-	paramObj.include = [Blocks]
+	paramObj.include = [Blocks,States,city]
 	try{
 		let userData = await Townships.findAll(paramObj)
 		const promises1 =  userData.map(async (f) => {
@@ -150,7 +152,7 @@ const uploadImage = async (req, res, next) => {
 	var matches = req.documents.match(/^data:([A-Za-z-+/]+);base64,(.+)$/),
 	response = {};
 	 
-	if (matches && matches.length !== 3) {
+	if (matches.length !== 3) {
 	return new Error('Invalid input string');
 	}
 	 
@@ -202,7 +204,7 @@ const bulkImport = async ( req, res ) =>{
 			  return resolve('');
 			})
 		  })
-		  	let newpath =  '/excel/'+req['filename2'];
+		  	let newpath =  'excel/'+req['filename2'];
 			const wb = XLSX.readFile(newpath);
 			const sheets = wb.SheetNames;
 			if(sheets.length > 0) {
