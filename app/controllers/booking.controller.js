@@ -54,25 +54,35 @@ var storage = multer.diskStorage({
 
 
 var mail = nodemailer.createTransport({
-	service: 'gmail',
+	host: "5.135.141.36",
+    port: 465,
+    secure: true,
 	auth: {
-	  user: 'piyushchourey11@gmail.com',
-	  pass: 'bfdyfqojiuicewuv'
+	  user: 'sales@bigblockinfra.com',
+	  pass: 'sales@bigblock'
 	}
   });
 
 sentEmail = (req,res,next) =>{
 	try{
 		if(!(_.isEmpty(req.body))){
+			//Fetch aggrement
+			let paramObj = {};
 			var mailOptions = {
-				from: 'piyushchourey11@gmail.com',
-				to: req.body.toEmail, //vyas19vishakha@gmail.com
+				from: 'sales@bigblockinfra.com',
+				to: req.body.toEmail,
 				subject: req.body.subject,
-				html: '<h1>Welcome Bigblock</h1>' ,
-				attachments: [{
-					filename: req.body.subject+".txt",
-					content: req.body.content
-				}]
+				html: req.body.content ,
+			}
+			paramObj.where = {id : req.body.bookingId };
+			paramObj.attributes = [ 'agreementDoc'];
+			let bookingData = await Booking.findAll(paramObj)
+			if(!(_.isEmpty(bookingData))){
+				mailOptions.attachments = [{
+					filename: 'Aggrement-doc.pdf',
+					path: 'excel/'+bookingData.agreementDoc,
+					contentType: 'application/pdf'
+				  }]
 			}
 			/* Send an email method */
 			mail.sendMail(mailOptions, function(error, info){
@@ -315,7 +325,8 @@ const bulkImport = async ( req, res ) =>{
 					mobile : row['Mobile Number'],
 					aadharcardNumber : row['Aadhar Card Number'],
 					plotAmount: row['Plot Amount'],
-					bookingAmount: row['Amount Received'],
+					bookingAmount: row['BOOKING AMOUNT'],
+					remainingAmount: row['Plot Amount'] - row['Amount Received'],
 					commission_type: row['Commission Type'],
 					commission_type_amount : row['Commission Type Amount'],
 					commission_amount: row['Commission Amount'],
