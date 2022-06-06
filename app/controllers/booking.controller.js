@@ -314,7 +314,6 @@ const bulkImport = async ( req, res ) =>{
 			const sheets = wb.SheetNames;
 			if(sheets.length > 0) {
 				const data = XLSX.utils.sheet_to_json(wb.Sheets[sheets[0]]);
-				console.log(data);
 				const bookingData = data.map(row => ({
 					townshipId: row['Township Name'],
 					blockId: row['Block Name'],
@@ -325,7 +324,8 @@ const bulkImport = async ( req, res ) =>{
 					mobile : row['Mobile Number'],
 					aadharcardNumber : row['Aadhar Card Number'],
 					plotAmount: row['Plot Amount'],
-					bookingAmount: row['BOOKING AMOUNT'],
+					bookingAmount: row['Booking Amount'],
+					commission_type_amount: row['Commission Type Amount'],
 					remainingAmount: row['Plot Amount'] - row['Amount Received'],
 					commission_type: row['Commission Type'],
 					commission_type_amount : row['Commission Type Amount'],
