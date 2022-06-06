@@ -63,7 +63,7 @@ var mail = nodemailer.createTransport({
 	}
   });
 
-sentEmail = (req,res,next) =>{
+sentEmail = async (req,res,next) =>{
 	try{
 		if(!(_.isEmpty(req.body))){
 			//Fetch aggrement
