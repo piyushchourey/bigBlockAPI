@@ -82,7 +82,8 @@ sentEmail = async (req,res,next) =>{
 			paramObj.attributes = [ 'agreementDoc'];
 			let bookingData = await Booking.findOne(paramObj);
 			bookingData = JSON.parse(JSON.stringify(bookingData));
-			if(!(_.isEmpty(bookingData))){
+			console.log(bookingData);
+			if(!(_.isEmpty(bookingData)) && bookingData!=null ){
 				mailOptions.attachments = [{
 					filename: 'Aggrement-doc.pdf',
 					path: 'excel/'+bookingData.agreementDoc,
