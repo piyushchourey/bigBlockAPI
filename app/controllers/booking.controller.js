@@ -333,6 +333,7 @@ const bulkImport = async ( req, res ) =>{
 					description: row['Description'],
 					status : row['Registry status'] =='Done' ? 1 : 0,
 				}))
+				console.log(bookingData);
 				await Booking.bulkCreate(bookingData); 
 				res.send({ status:1, data:[], message: "Booking was uploaded successfully!" });
 			}
