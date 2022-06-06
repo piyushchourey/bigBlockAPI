@@ -328,7 +328,6 @@ const bulkImport = async ( req, res ) =>{
 					commission_type_amount: row['Commission Type Amount'],
 					remainingAmount: row['Plot Amount'] - row['Amount Received'],
 					commission_type: row['Commission Type'],
-					commission_type_amount : row['Commission Type Amount'],
 					commission_amount: row['Commission Amount'],
 					paymentMode: row['Payment Mode'],
 					description: row['Description'],
