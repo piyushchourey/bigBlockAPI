@@ -55,11 +55,11 @@ var storage = multer.diskStorage({
 
 var mail = nodemailer.createTransport({
 	host: "mail.bigblockinfra.com",
-    port: 465,
-    secure: true,
+    port: 25,
+    secure: false,
 	auth: {
 	  user: 'sales@bigblockinfra.com',
-	  pass: 'sales@bigblock'
+	  pass: 'Sales'
 	}
   });
 
