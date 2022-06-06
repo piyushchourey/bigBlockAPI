@@ -8,5 +8,6 @@ router.get("/getAll", [ authJwt.verifyToken ], booking.getAll);
 router.put("/update", [ authJwt.verifyToken ], booking.doUpdate);
 router.delete("/remove",[ authJwt.verifyToken ], booking.doRemove);
 router.post("/sendMail", [ authJwt.verifyToken ], booking.sentEmail);
+router.post("/import",[ authJwt.verifyToken ], booking.bulkImport);
 
 module.exports = router; 

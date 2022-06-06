@@ -10,6 +10,48 @@ const Blocks = db.blocks;
 const Plots = db.plots;
 const Brokers = db.broker;
 var nodemailer = require('nodemailer');
+const XLSX = require("xlsx"); 
+var multer  = require('multer');
+
+
+
+
+var storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		// console.log('test123')
+	  cb(null, './excel/')
+	},
+	filename: function (req, file, cb) {
+		console.log('filenmeaff')
+		let filenqme =  Date.now()+file.originalname
+		req['filename2'] = filenqme
+	  cb(null, filenqme)
+	}
+  })
+  
+  const fileFilter=(req, file, cb)=>{
+	console.log("sdsads");
+//    if(file.mimetype ==='csv' || file.mimetype ==='xls'){
+// 	   cb(null,true);
+//    }else{
+// 	   cb(null, false);
+//    }
+  
+  }
+  
+  var upload = multer({ 
+	storage:storage
+	// limits:{
+	// 	fileSize: 1024 * 1024 * 5
+	// },
+	// fileFilter:fileFilter
+  });
+  
+  const singleFileUpload = upload.single("importFile")
+
+
+
+
 
 var mail = nodemailer.createTransport({
 	service: 'gmail',
@@ -243,11 +285,59 @@ const doUpdate = async (req,res,next) =>{
 	}
 }
 
+const bulkImport = async ( req, res ) =>{
+	try{
+		console.log(req.files); 
+		console.log(__dirname)
+		let data = await new Promise((resolve, reject) => {
+			console.log('runnn')
+			return singleFileUpload(req, res, err => {
+				console.log(err) 
+				// console.log(res)
+
+			  if (err) return reject(err)
+			  return resolve('');
+			})
+		  })
+		  	let newpath =  'excel/'+req['filename2'];
+			const wb = XLSX.readFile(newpath);
+			const sheets = wb.SheetNames;
+			if(sheets.length > 0) {
+				const data = XLSX.utils.sheet_to_json(wb.Sheets[sheets[0]]);
+				console.log(data);
+				const bookingData = data.map(row => ({
+					townshipId: row['Township Name'],
+					blockId: row['Block Name'],
+					plotId: row['Plot Number'],
+					brokerId : row['Broker Name'],
+					client_name : row['Client Name'],
+					email : row['Email Address'],
+					mobile : row['Mobile Number'],
+					aadharcardNumber : row['Aadhar Card Number'],
+					plotAmount: row['Plot Amount'],
+					bookingAmount: row['Amount Received'],
+					commission_type: row['Commission Type'],
+					commission_type_amount : row['Commission Type Amount'],
+					commission_amount: row['Commission Amount'],
+					paymentMode: row['Payment Mode'],
+					description: row['Description'],
+					status : row['Registry status'] =='Done' ? 1 : 0,
+				}))
+				await Booking.bulkCreate(bookingData); 
+				res.send({ status:1, data:[], message: "Booking was uploaded successfully!" });
+			}
+	}catch(err){
+		res.status(500).send({ status :0, data : [], message: err.message || "Some error occurred while retrieving tutorials." });
+	}
+};
+
+
 
 module.exports = {
     create,
     getAll,
 	doUpdate,
 	doRemove,
-	sentEmail
+	sentEmail,
+	bulkImport
 };
