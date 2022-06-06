@@ -60,7 +60,11 @@ var mail = nodemailer.createTransport({
 	auth: {
 	  user: 'sales@bigblockinfra.com',
 	  pass: 'Sales'
-	}
+	},
+    tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false
+    },
   });
 
 sentEmail = async (req,res,next) =>{
