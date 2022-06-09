@@ -7,68 +7,24 @@ const Blocks = db.blocks;
 const Plots = db.plots;
 const Brokers = db.broker;
 const Sequelize = require("sequelize");
+const sequelize = db.sequelize;
 
 const getReport = async (req, res) => {
     console.log(req.query);
-	const orConditions = [];
-	const paramObj = {};
-	if(req.query.townshipId){
-		const townshipId = req.query.townshipId; 
-		var townshipCondition = townshipId ? { townshipId: { [Op.eq]: `%${townshipId}%` } } : null;
-		orConditions.push(townshipCondition);
-	}
-	if(req.query.blockId){
-		const blockId = req.query.blockId;
-		var blockIdCondition = blockId ? { blockId: { [Op.eq]: `%${blockId}%` } } : null;
-		orConditions.push(blockIdCondition);
-	}
-	if(req.query.plotId){
-		const plotId = req.query.plotId;
-		var plotIdCondition = plotId ? { plotId: { [Op.eq]: `%${plotId}%` } } : null;
-		orConditions.push(plotIdCondition);
-	}
-	if(req.query.status){
-		const status = req.query.status;
-		var statusCondition = status ? { status: { [Op.eq]: `%${status}%` } } : null;
-		orConditions.push(statusCondition);
-	}
-	if(req.query.userId){
-		const userId = req.query.userId;
-		var userIdCondition = userId ? { userId: { [Op.eq]: `%${userId}%` } } : null;
-		orConditions.push(userIdCondition);
-	}
-	if(_.size(orConditions) > 0){
-		paramObj.where = { [Op.or]: orConditions };
-	}
-
     if(req.query.filteredBy == "townships"){
-        paramObj.include =  [{model: Townships, attributes:['township_name']}];
-        paramObj.group = ['booking.townshipId'];
-    }
+		query = `SELECT township.township_name as township_name, township.total_size_of_township as saleable_area, booking.description, SUM(bookingAmount) AS bookingAmount, SUM(plotAmount) AS plotAmount, SUM(commission_amount) AS commission_amount, SUM(remainingAmount) AS remainingAmount, SUM(dimesion) AS areaSold FROM bookings AS booking LEFT OUTER JOIN townships AS township ON booking.townshipId = township.id LEFT OUTER JOIN plots AS plot ON booking.plotId = plot.id GROUP BY booking.townshipId;`
+	}
     if(req.query.filteredBy == "blocks"){
-        paramObj.include =  [{model: Blocks, attributes:['name']}];
-        paramObj.group = ['booking.blockId'];
-    }
+		query = `SELECT township.township_name as township_name, block.name as block_name, block.size as saleable_area, SUM(bookingAmount) AS bookingAmount, SUM(plotAmount) AS plotAmount, SUM(commission_amount) AS commission_amount, SUM(remainingAmount) AS remainingAmount, SUM(dimesion) AS areaSold FROM bookings AS booking LEFT OUTER JOIN townships AS township ON booking.townshipId = township.id LEFT OUTER JOIN plots AS plot ON booking.plotId = plot.id LEFT OUTER JOIN blocks AS block ON booking.blockId = block.id  GROUP BY booking.blockId;`
+	}
     if(req.query.filteredBy == "plots"){
-        paramObj.include =  [{model: Plots, attributes:['plot_number']}];
-        paramObj.group = ['booking.plotId'];
+		query = `SELECT township.township_name as township_name, plot.plot_number as plot_number, booking.plotAmount as plot_amount, booking.bookingAmount AS bookingAmount, booking.commission_amount AS commission_amount, booking.remainingAmount AS remainingAmount, booking.description as description, plot.dimesion as plot_size, broker.first_name, broker.last_name  FROM bookings AS booking LEFT OUTER JOIN townships AS township ON booking.townshipId = township.id LEFT OUTER JOIN plots AS plot ON booking.plotId = plot.id LEFT OUTER JOIN brokers as broker ON booking.brokerId = broker.id ORDER BY booking.createdAt;`
     }
     if(req.query.filteredBy == "brokers"){
-        paramObj.include =  [{model: Brokers, attributes:['first_name','last_name','mobile_number']}];
-        paramObj.group = ['booking.brokerId'];
-    }
-
-    Booking.findAll({
-        attributes:[
-			'description',
-            [ Sequelize.fn('SUM', Sequelize.col('bookingAmount')), 'bookingAmount'],
-            [ Sequelize.fn('SUM', Sequelize.col('plotAmount')), 'plotAmount'],
-            [ Sequelize.fn('SUM', Sequelize.col('commission_amount')), 'commission_amount'],
-            [ Sequelize.fn('SUM', Sequelize.col('remainingAmount')), 'remainingAmount'],
-        ],
-        include: paramObj.include,
-        group:  paramObj.group
-        }).then(result =>res.send({ status:1, data:result, message: '' }))
+        query = `SELECT broker.first_name, broker.last_name, COUNT(booking.plotID) as number_of_plot, SUM(bookingAmount) AS bookingAmount, SUM(plotAmount) AS plotAmount, SUM(commission_amount) AS commission_amount, SUM(remainingAmount) AS remainingAmount FROM bookings AS booking LEFT OUTER JOIN brokers AS broker ON booking.brokerId = broker.id GROUP BY booking.brokerId;`
+	}
+    resultData = await sequelize.query(query, { type: Sequelize.SELECT });
+	res.send({ status:1, data:resultData, message: '' })
 };
 
 const getDashboardWidgetData = async (req, res) => {
