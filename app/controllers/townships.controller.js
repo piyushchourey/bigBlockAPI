@@ -243,7 +243,7 @@ const bulkExport = async (req,res) =>{
 		return f;
 		})
 	let newArray = await Promise.all(promises1);
-	res.send({ status:1, data:newArray, msg:'' });
+	//res.send({ status:1, data:newArray, msg:'' });
 	// data to write into each sheet of the workbook
 	let data = [
 	  [ { colA: 1, colB: 2, colC: 3 }, { colA: 4, colB: 5, colC: 6 }, { colA: 7, colB: 8, colC: 9 } ]
