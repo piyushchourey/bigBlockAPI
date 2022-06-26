@@ -231,10 +231,43 @@ const bulkImport = async ( req, res ) =>{
 	}
 };
 
+//Excel data exported
+const bulkExport = async (req,res) =>{
+	// headers for the excel sheet 
+	let finalHeaders = ['colA', 'colB', 'colC'];
+	const paramObj = {};
+	paramObj.include = [Blocks,States,city]
+	let userData = await Townships.findAll(paramObj)
+	const promises1 =  userData.map(async (f) => {
+		f.documents =  process.env.API_URL+'images/'+f.documents;
+		return f;
+		})
+	let newArray = await Promise.all(promises1);
+	res.send({ status:1, data:newArray, msg:'' });
+	// data to write into each sheet of the workbook
+	let data = [
+	  [ { colA: 1, colB: 2, colC: 3 }, { colA: 4, colB: 5, colC: 6 }, { colA: 7, colB: 8, colC: 9 } ]
+	];
+
+	// create workbook
+	let wb = XLSX.utils.book_new()
+	// for each to write into excel sheets.
+	data.forEach((array, i) => {
+	  let ws = XLSX.utils.json_to_sheet(array, {header: finalHeaders});
+	  XLSX.utils.book_append_sheet(wb, ws, `SheetJS_${i}`)
+	 });
+	 // file name of the excel sheet
+	 let exportFileName = `excel/export/xlsx_workbook_demo.xls`;
+	 // create excel sheet
+	 XLSX.writeFile(wb, exportFileName)
+	 res.send({ status:1, data:'excel/export/xlsx_workbook_demo.xls', msg:'File exported.' });
+}
+
 module.exports = {
     create,
     getAll,
 	doRemove,
 	doUpdate,
-	bulkImport
+	bulkImport,
+	bulkExport
 };

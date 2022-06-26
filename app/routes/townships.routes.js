@@ -19,6 +19,7 @@ router.get("/getAll",[ authJwt.verifyToken ], townships.getAll);
 router.put("/update", [ authJwt.verifyToken ], townships.doUpdate);
 router.delete("/remove",[ authJwt.verifyToken ], townships.doRemove);
 router.post("/import",[ authJwt.verifyToken ], townships.bulkImport);
+router.post("/export", [ authJwt.verifyToken ], townships.bulkExport);
 
 module.exports = router; 
 
