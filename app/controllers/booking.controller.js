@@ -85,9 +85,9 @@ sentEmail = async (req,res,next) =>{
 			console.log(bookingData);
 			if(!(_.isEmpty(bookingData)) && bookingData!=null ){
 				mailOptions.attachments = [{
-					filename: 'Aggrement-doc.pdf',
-					path: 'excel/'+bookingData.agreementDoc,
-					contentType: 'application/pdf'
+					filename: bookingData.agreementDoc,
+					path: 'images/'+bookingData.agreementDoc,
+					//contentType: 'application/pdf'
 				  }]
 			}
 			/* Send an email method */
@@ -271,8 +271,7 @@ const doRemove = ( req, res ) =>{
 /** This function is used to update booking data **/
 const doUpdate = async (req,res,next) =>{
 	const Postdata = req.body;
-	console.log(Postdata);
-	let UpdateBookingDataExceptID = _.omit(req.body, ['townshipId','blockId','plotId','aadharcardDoc','salarySlipDoc','agreementDoc','commission_type_amount']);
+	let UpdateBookingDataExceptID = _.omit(req.body, ['townshipId','blockId','plotId','aadharcardDoc','salarySlipDoc','commission_type_amount']);
 	let UpdateBookingDataOfID = _.pick(req.body, ['id']);
 	try{
 		if(Postdata.plotAmount < Postdata.bookingAmount){
@@ -281,11 +280,14 @@ const doUpdate = async (req,res,next) =>{
 		const bookingExistData = await Booking.findByPk(UpdateBookingDataOfID.id);
 		console.log(bookingExistData);
 		if(bookingExistData){
-			// let matches = (Postdata.documents).match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
-			// if (matches.length === 3) {
-			// 	var ImageFileName = await uploadImage(Postdata)
-			// 	UpdateTownshipDataExceptID['documents']= ImageFileName; 
-			// }
+			let matches = (Postdata.agreementDoc).match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+			if (matches.length === 3) {
+				let imgObj = {};
+				imgObj['documents'] = Postdata.agreementDoc;
+				var ImageFileName = await sigleUploadImage(imgObj)
+				UpdateBookingDataExceptID['agreementDoc']= ImageFileName; 
+			}
+			console.log(UpdateBookingDataExceptID);
 			await Booking.update(UpdateBookingDataExceptID,{
 				where : { id : UpdateBookingDataOfID.id } 
 			}).then(data => {

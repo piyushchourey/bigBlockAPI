@@ -96,8 +96,46 @@ const getDashboardReportChart = async (req, res) =>{
 	}
 }
 
+const getPieChartData = async (req,res) =>{
+	let townshipId = req.query.townshipId;
+	const response = { data:[], lable:[]};
+	let whereObj = {};
+	if(townshipId && townshipId!=""){
+		whereObj.where = { 'townshipId': townshipId  };
+	}
+	try{
+		/** Total Plots **/
+		let plotsData = await Booking.findAll({
+			whereObj,
+			attributes:[
+				[ Sequelize.fn('Count', Sequelize.col('booking.id')), 'count']
+			],
+			include : [{model: Plots, attributes:['plot_status']}],
+			group : ['plot_status']
+		});
+
+		//data = _.pick(plotsData.dataValues,'total_booking');
+
+		console.log(plotsData);
+		plotsData = JSON.parse(JSON.stringify(plotsData))
+		const promises1 =  plotsData.map(async (f) => {
+			response.data.push(f.count);
+			response.lable.push(f.plot.plot_status);
+			return response;
+		 })
+		let newArray = await Promise.all(promises1);
+		res.send({ status:1, data:newArray, message: '' });
+
+	}catch(err){
+		res.send({ status:0, data:[], message: err.message })
+	}
+}
+
+
+
 module.exports = {
     getReport,
 	getDashboardWidgetData,
-	getDashboardReportChart
+	getDashboardReportChart,
+	getPieChartData
 };
