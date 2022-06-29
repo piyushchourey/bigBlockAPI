@@ -100,27 +100,28 @@ const getPieChartData = async (req,res) =>{
 	let townshipId = req.query.townshipId;
 	const response = { data:[], lable:[]};
 	let whereObj = {};
+	let whereObjStr = "";
 	if(townshipId && townshipId!=""){
-		whereObj.where = { 'townshipId': townshipId  };
+		//whereObj.where = { 'townshipId': townshipId  };
+		whereObjStr = " where `townshipId` = "+townshipId;
 	}
 	try{
 		/** Total Plots **/
-		let plotsData = await Booking.findAll({
-			whereObj,
-			attributes:[
-				[ Sequelize.fn('Count', Sequelize.col('booking.id')), 'count']
-			],
-			include : [{model: Plots, attributes:['plot_status']}],
-			group : ['plot_status']
-		});
-
-		//data = _.pick(plotsData.dataValues,'total_booking');
-
-		console.log(plotsData);
-		plotsData = JSON.parse(JSON.stringify(plotsData))
+		// let plotsData = await Plots.findAll({
+		// 	whereObj,
+		// 	attributes:[
+		// 		[ Sequelize.fn('Count', Sequelize.col('id')), 'count'],
+		// 		'plot_status'
+		// 	],
+		// 	group : ['plot_status']
+		// });
+		query ="SELECT COUNT(`id`) as count, `plot_status` FROM `plots`"+whereObjStr+" group by `plot_status`";
+		resultData = await sequelize.query(query, { type: Sequelize.SELECT });
+		plotsData = JSON.parse(JSON.stringify(resultData[0]))
+		console.log(resultData);
 		const promises1 =  plotsData.map(async (f) => {
 			response.data.push(f.count);
-			response.lable.push(f.plot.plot_status);
+			response.lable.push(f.plot_status);
 			return response;
 		 })
 		let newArray = await Promise.all(promises1);

@@ -104,8 +104,6 @@ sentEmail = async (req,res,next) =>{
 	}
 }
 
-
-
 // Create and Save a new Township
 const create = async (req, res) => {
 	// Validate request
@@ -271,6 +269,9 @@ const doRemove = ( req, res ) =>{
 /** This function is used to update booking data **/
 const doUpdate = async (req,res,next) =>{
 	const Postdata = req.body;
+	if(req.body.brokerId==""){
+		req.body = _.omit(req.body,['brokerId'])
+	}
 	let UpdateBookingDataExceptID = _.omit(req.body, ['townshipId','blockId','plotId','aadharcardDoc','salarySlipDoc','commission_type_amount']);
 	let UpdateBookingDataOfID = _.pick(req.body, ['id']);
 	try{

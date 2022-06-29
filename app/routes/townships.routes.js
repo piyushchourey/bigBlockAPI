@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage }); 
 
-router.post("/create", [ authJwt.verifyToken, commonServices.checkDuplicateTownship ], townships.create);
+router.post("/create", [ authJwt.verifyToken ], townships.create);
 router.get("/getAll",[ authJwt.verifyToken ], townships.getAll);
 router.put("/update", [ authJwt.verifyToken ], townships.doUpdate);
 router.delete("/remove",[ authJwt.verifyToken ], townships.doRemove);

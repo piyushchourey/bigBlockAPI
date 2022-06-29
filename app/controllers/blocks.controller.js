@@ -45,7 +45,14 @@ const create = async (req, res) => {
     try{
 		if(!(_.isEmpty(req.body))){
 			var blockPostData = req.body;
-			Blocks.bulkCreate(blockPostData).then(block => {
+            const promises1 =  blockPostData.map(async (f) => {
+	            if(f.id==""){
+					delete f.id;
+				}
+				return f;
+            })
+			let newArray = await Promise.all(promises1);
+			Blocks.bulkCreate(newArray).then(block => {
 					res.send({ status:1, data:[], message: "Block was registered successfully!" });
 			}).catch(err => {
 					res.status(500).send({ status:0, data:[], message: err.message });
