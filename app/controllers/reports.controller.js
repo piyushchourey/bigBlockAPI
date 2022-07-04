@@ -8,9 +8,9 @@ const Plots = db.plots;
 const Brokers = db.broker;
 const Sequelize = require("sequelize");
 const sequelize = db.sequelize;
+const XLSX = require("xlsx"); 
 
 const getReport = async (req, res) => {
-    console.log(req.query);
     if(req.query.filteredBy == "townships"){
 		query = `SELECT township.township_name as township_name, township.total_size_of_township as saleable_area, booking.description, SUM(bookingAmount) AS bookingAmount, SUM(plotAmount) AS plotAmount, SUM(commission_amount) AS commission_amount, SUM(remainingAmount) AS remainingAmount, SUM(dimesion) AS areaSold FROM bookings AS booking LEFT OUTER JOIN townships AS township ON booking.townshipId = township.id LEFT OUTER JOIN plots AS plot ON booking.plotId = plot.id GROUP BY booking.townshipId;`
 	}
@@ -80,10 +80,8 @@ const getDashboardReportChart = async (req, res) =>{
 
 		//data = _.pick(plotsData.dataValues,'total_booking');
 
-		console.log(plotsData);
 		plotsData = JSON.parse(JSON.stringify(plotsData))
 		const promises1 =  plotsData.map(async (f) => {
-			console.log(f.total_booking);
 			response.data.push(f.total_booking);
 			response.lable.push(f.MonthName);
 			return response;
@@ -118,7 +116,6 @@ const getPieChartData = async (req,res) =>{
 		query ="SELECT COUNT(`id`) as count, `plot_status` FROM `plots`"+whereObjStr+" group by `plot_status`";
 		resultData = await sequelize.query(query, { type: Sequelize.SELECT });
 		plotsData = JSON.parse(JSON.stringify(resultData[0]))
-		console.log(resultData);
 		const promises1 =  plotsData.map(async (f) => {
 			response.data.push(f.count);
 			response.lable.push(f.plot_status);
@@ -132,11 +129,46 @@ const getPieChartData = async (req,res) =>{
 	}
 }
 
+const dataExport = async (req,res) =>{
+	if(req.body.reportType && req.body.reportType == 'townships'){
+		query = `SELECT township.township_name as township_name, township.total_size_of_township as saleable_area, booking.description, SUM(bookingAmount) AS bookingAmount, SUM(plotAmount) AS plotAmount, SUM(commission_amount) AS commission_amount, SUM(remainingAmount) AS remainingAmount, SUM(dimesion) AS areaSold FROM bookings AS booking LEFT OUTER JOIN townships AS township ON booking.townshipId = township.id LEFT OUTER JOIN plots AS plot ON booking.plotId = plot.id GROUP BY booking.townshipId;`
+	}else if(req.body.reportType && req.body.reportType == 'blocks'){
+		query = `SELECT township.township_name as township_name, block.name as block_name, block.size as saleable_area, SUM(bookingAmount) AS bookingAmount, SUM(plotAmount) AS plotAmount, SUM(commission_amount) AS commission_amount, SUM(remainingAmount) AS remainingAmount, SUM(dimesion) AS areaSold FROM bookings AS booking LEFT OUTER JOIN townships AS township ON booking.townshipId = township.id LEFT OUTER JOIN plots AS plot ON booking.plotId = plot.id LEFT OUTER JOIN blocks AS block ON booking.blockId = block.id  GROUP BY booking.blockId;`
+	}else if(req.body.reportType && req.body.reportType == 'plots'){
+		query = `SELECT township.township_name as township_name, plot.plot_number as plot_number, booking.plotAmount as plot_amount, booking.bookingAmount AS bookingAmount, booking.commission_amount AS commission_amount, booking.remainingAmount AS remainingAmount, booking.description as description, plot.dimesion as plot_size, broker.first_name, broker.last_name  FROM bookings AS booking LEFT OUTER JOIN townships AS township ON booking.townshipId = township.id LEFT OUTER JOIN plots AS plot ON booking.plotId = plot.id LEFT OUTER JOIN brokers as broker ON booking.brokerId = broker.id ORDER BY booking.createdAt;`
+	}else{
+		query = `SELECT broker.first_name, broker.last_name, COUNT(booking.plotID) as number_of_plot, SUM(bookingAmount) AS bookingAmount, SUM(plotAmount) AS plotAmount, SUM(commission_amount) AS commission_amount, SUM(remainingAmount) AS remainingAmount FROM bookings AS booking LEFT OUTER JOIN brokers AS broker ON booking.brokerId = broker.id GROUP BY booking.brokerId;`
+	}
+
+	resultData = await sequelize.query(query, { type: Sequelize.SELECT });
+	
+	resultData = JSON.parse(JSON.stringify(resultData))
+	
+	// headers for the excel sheet 
+	let finalHeaders = ['Township Name', 'Plot Amount', 'Payment Received','Commission Amount', 'Amount To Be Received', 'Saleble Area','Area Sold','Remaining Area','Description'];
+	// data to write into each sheet of the workbook
+	let data = [resultData[0]];
+	
+	// create workbook
+	let wb = XLSX.utils.book_new()
+	// for each to write into excel sheets.
+	data.forEach((array, i) => {
+	  let ws = XLSX.utils.json_to_sheet(array, {header: finalHeaders});
+	  XLSX.utils.book_append_sheet(wb, ws, `SheetJS_${i}`)
+	 });
+	 // file name of the excel sheet
+	 let exportFileName = `excel/export/`+Date.now()+`.xls`;
+	 // create excel sheet
+	 XLSX.writeFile(wb, exportFileName)
+	 res.send({ status:1, data: process.env.API_URL+'excel/export/xlsx_workbook_demo.xls', msg:'File exported.' });
+}
+
 
 
 module.exports = {
     getReport,
 	getDashboardWidgetData,
 	getDashboardReportChart,
-	getPieChartData
+	getPieChartData,
+	dataExport
 };

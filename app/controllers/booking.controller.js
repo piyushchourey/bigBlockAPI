@@ -113,6 +113,12 @@ const create = async (req, res) => {
 			if(bookingPostData.plotAmount < bookingPostData.bookingAmount){
 				res.send({ status:0, data:[], message:  "Please enter valid plot amount."});
 			}
+
+			if(bookingPostData.plotAmount < (bookingPostData.cashPlotAmount + bookingPostData.checkPlotAmount)) {
+				res.send({ status:0, data:[], message:  "Plot amount must be equal to Cash/Check amount."});
+			}
+
+
 			//documents upload functionality..
 			var bookingPostFilteredData = {aadharcardDoc :null, salarySlipDoc:null, agreementDoc:null};
 			var bookingPostFilteredData1 = _.pick(req.body, _.keys(bookingPostFilteredData));
@@ -123,7 +129,7 @@ const create = async (req, res) => {
 
 			let agreementDoc =  sigleUploadImage({documents:bookingPostFilteredData1.agreementDoc});
 			let newArray = await Promise.all([aadharcarddoc,salarySlipDoc,agreementDoc]);
-			console.log(newArray)
+			
 			bookingPostData['aadharcardDoc'] = newArray[0];
 			bookingPostData['salarySlipDoc'] = newArray[1];
 			bookingPostData['agreementDoc'] = newArray[2];
@@ -277,6 +283,9 @@ const doUpdate = async (req,res,next) =>{
 	try{
 		if(Postdata.plotAmount < Postdata.bookingAmount){
 			res.send({ status:0, data:[], message:  "Please enter valid plot amount."});
+		}
+		if(bookingPostData.plotAmount < (bookingPostData.cashPlotAmount + bookingPostData.checkPlotAmount)) {
+			res.send({ status:0, data:[], message:  "Plot amount must be equal to Sum of Cash/Check amount."});
 		}
 		const bookingExistData = await Booking.findByPk(UpdateBookingDataOfID.id);
 		console.log(bookingExistData);

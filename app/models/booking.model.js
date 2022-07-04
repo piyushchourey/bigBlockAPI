@@ -33,7 +33,19 @@ module.exports = (sequelize, Sequelize) => {
         plotAmount: {
             type: Sequelize.FLOAT
         },
+        cashPlotAmount: {
+            type: Sequelize.FLOAT
+        },
+        checkPlotAmount: {
+            type: Sequelize.FLOAT
+        },
         bookingAmount : {
+            type: Sequelize.FLOAT(11)
+        },
+        cashAmountReceived : {
+            type: Sequelize.FLOAT(11)
+        },
+        checkAmountReceived : {
             type: Sequelize.FLOAT(11)
         },
         remainingAmount : {
