@@ -153,7 +153,7 @@ const dataExport = async (req,res) =>{
 	let wb = XLSX.utils.book_new()
 	// for each to write into excel sheets.
 	data.forEach((array, i) => {
-	  let ws = XLSX.utils.json_to_sheet(array, {header: finalHeaders});
+	  let ws = XLSX.utils.json_to_sheet(array);
 	  XLSX.utils.book_append_sheet(wb, ws, `SheetJS_${i}`)
 	 });
 	 // file name of the excel sheet
