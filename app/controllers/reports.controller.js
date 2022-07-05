@@ -160,7 +160,7 @@ const dataExport = async (req,res) =>{
 	 let exportFileName = `excel/export/`+Date.now()+`.xls`;
 	 // create excel sheet
 	 XLSX.writeFile(wb, exportFileName)
-	 res.send({ status:1, data: process.env.API_URL+'excel/export/xlsx_workbook_demo.xls', msg:'File exported.' });
+	 res.send({ status:1, data: process.env.API_URL+exportFileName, msg:'File exported.' });
 }
 
 
