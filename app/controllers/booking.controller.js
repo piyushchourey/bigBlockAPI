@@ -110,15 +110,17 @@ const create = async (req, res) => {
 	try{
 		if(!(_.isEmpty(req.body))){
 			var bookingPostData = req.body;
-			if(bookingPostData.plotAmount < bookingPostData.bookingAmount){
+
+			if(parseInt(bookingPostData.plotAmount) < parseInt(bookingPostData.bookingAmount)){
 				res.send({ status:0, data:[], message:  "Please enter valid plot amount."});
 			}
 
-			if(bookingPostData.plotAmount < (bookingPostData.cashPlotAmount + bookingPostData.checkPlotAmount)) {
+			if(parseInt(bookingPostData.plotAmount) < (parseInt(bookingPostData.cashPlotAmount) + parseInt(bookingPostData.checkPlotAmount))) {
 				res.send({ status:0, data:[], message:  "Plot amount must be equal to Cash/Check amount."});
 			}
-
-
+            if(bookingPostData.brokerId==""){
+				bookingPostData['brokerId'] = 0;
+			}
 			//documents upload functionality..
 			var bookingPostFilteredData = {aadharcardDoc :null, salarySlipDoc:null, agreementDoc:null};
 			var bookingPostFilteredData1 = _.pick(req.body, _.keys(bookingPostFilteredData));
@@ -284,7 +286,7 @@ const doUpdate = async (req,res,next) =>{
 		if(Postdata.plotAmount < Postdata.bookingAmount){
 			res.send({ status:0, data:[], message:  "Please enter valid plot amount."});
 		}
-		if(bookingPostData.plotAmount < (bookingPostData.cashPlotAmount + bookingPostData.checkPlotAmount)) {
+		if(Postdata.plotAmount < (Postdata.cashPlotAmount + Postdata.checkPlotAmount)) {
 			res.send({ status:0, data:[], message:  "Plot amount must be equal to Sum of Cash/Check amount."});
 		}
 		const bookingExistData = await Booking.findByPk(UpdateBookingDataOfID.id);
